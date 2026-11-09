@@ -1,0 +1,13 @@
+# Final Year Project: Amazon Clone E-Commerce Application
+# Requirements Specification
+# Author: Bhuvan Kolisetti
+# Repository: https://github.com/bhuvankolisetti/e-commerce
+
+# Core Application: Zero-dependency built-in Python standard library
+# (http.server, sqlite3, json, hashlib, urllib)
+
+# Optional dependencies for Flask/Production deployment extensions:
+flask>=3.0.0
+gunicorn>=21.2.0
+requests>=2.31.0
+
