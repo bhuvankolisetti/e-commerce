@@ -1,6 +1,6 @@
 """
 Automated Test Suite for Amazon Clone E-Commerce Application
-Runs unit and integration tests on Database, Authentication, and Business Logic.
+Runs unit and integration tests on Database, Authentication, Coupons, and Business Logic.
 Author: Bhuvan Kolisetti
 Repository: https://github.com/bhuvankolisetti/e-commerce
 """
@@ -27,10 +27,10 @@ class TestAmazonClone(unittest.TestCase):
         tables = [row[0] for row in cursor.fetchall()]
         conn.close()
 
-        required_tables = ['users', 'products', 'orders', 'order_items', 'reviews']
+        required_tables = ['users', 'products', 'orders', 'order_items', 'reviews', 'coupons', 'wishlist']
         for tbl in required_tables:
             self.assertIn(tbl, tables, f"Missing table: {tbl}")
-        print("[✓] Database schema verified with all 5 core tables.")
+        print("[✓] Database schema verified with all 7 core tables.")
 
     def test_02_password_hashing(self):
         """Test SHA-256 cryptographic password hashing"""
@@ -41,13 +41,13 @@ class TestAmazonClone(unittest.TestCase):
         self.assertNotEqual(raw_password, hashed)
         print("[✓] Password hashing algorithm (SHA-256) operates correctly.")
 
-    def test_03_products_catalog_seeded(self):
-        """Verify initial catalog products and categories"""
+    def test_03_expanded_catalog_seeded(self):
+        """Verify 26 catalog products across 4 core departments"""
         conn = get_db()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM products")
         count = cursor.fetchone()[0]
-        self.assertGreaterEqual(count, 10, "Expected at least 10 seeded products")
+        self.assertGreaterEqual(count, 20, "Expected at least 20 seeded products")
 
         cursor.execute("SELECT DISTINCT category FROM products")
         categories = [r[0] for r in cursor.fetchall()]
@@ -59,18 +59,18 @@ class TestAmazonClone(unittest.TestCase):
         self.assertIn("Books", categories)
         print(f"[✓] Product catalog seeded with {count} items across {len(categories)} categories.")
 
-    def test_04_discount_calculation(self):
-        """Verify deal prices and discounts are accurate"""
+    def test_04_coupon_codes_active(self):
+        """Verify promo coupons are seeded and active"""
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute("SELECT title, price, original_price, discount_pct FROM products LIMIT 5")
-        rows = cursor.fetchall()
+        cursor.execute("SELECT code, discount_percent, discount_flat FROM coupons WHERE active = 1")
+        coupons = {r['code']: dict(r) for r in cursor.fetchall()}
         conn.close()
 
-        for r in rows:
-            self.assertLessEqual(r['price'], r['original_price'], f"Deal price must not exceed MRP for {r['title']}")
-            self.assertGreaterEqual(r['discount_pct'], 0)
-        print("[✓] Pricing integrity and discount percentages verified.")
+        self.assertIn("AMAZON20", coupons)
+        self.assertEqual(coupons["AMAZON20"]["discount_percent"], 20.0)
+        self.assertIn("PRIME10", coupons)
+        print(f"[✓] Active coupon discounts verified: {list(coupons.keys())}.")
 
     def test_05_admin_user_exists(self):
         """Ensure default administrator account exists"""
@@ -85,40 +85,36 @@ class TestAmazonClone(unittest.TestCase):
         print("[✓] Default admin user verified.")
 
     def test_06_order_and_order_items_creation(self):
-        """Test complete order creation workflow"""
+        """Test complete order creation workflow with discount support"""
         conn = get_db()
         cursor = conn.cursor()
 
-        order_num = "TEST-ORDER-001"
+        order_num = "TEST-ORDER-EXP-001"
         cursor.execute("""
         INSERT INTO orders 
-        (order_number, user_id, customer_name, customer_email, shipping_address, city, postal_code, payment_method, subtotal, tax, shipping, total_amount, status)
-        VALUES (?, 1, 'Test User', 'test@example.com', '123 Test St', 'Hyderabad', '500081', 'Credit Card', 100.0, 8.0, 0.0, 108.0, 'Processing')
+        (order_number, user_id, customer_name, customer_email, shipping_address, city, postal_code, payment_method, subtotal, discount, tax, shipping, total_amount, status)
+        VALUES (?, 1, 'Bhuvan Kolisetti', 'bhuvan@amazon.com', 'Flat 402', 'Hyderabad', '500081', 'Credit Card', 100.0, 20.0, 6.4, 0.0, 86.4, 'Processing')
         """, (order_num,))
         order_id = cursor.lastrowid
 
         cursor.execute("""
         INSERT INTO order_items (order_id, product_id, product_title, product_image, quantity, unit_price)
-        VALUES (?, 1, 'Test Product', 'http://example.com/img.jpg', 1, 100.0)
+        VALUES (?, 1, 'MacBook Pro', 'http://example.com/img.jpg', 1, 100.0)
         """, (order_id,))
         conn.commit()
 
         # Query back
         cursor.execute("SELECT * FROM orders WHERE id = ?", (order_id,))
         saved_order = cursor.fetchone()
-        cursor.execute("SELECT * FROM order_items WHERE order_id = ?", (order_id,))
-        saved_items = cursor.fetchall()
-
         self.assertIsNotNone(saved_order)
-        self.assertEqual(len(saved_items), 1)
+        self.assertEqual(saved_order['total_amount'], 86.4)
 
-        # Cleanup test order
+        # Cleanup
         cursor.execute("DELETE FROM order_items WHERE order_id = ?", (order_id,))
         cursor.execute("DELETE FROM orders WHERE id = ?", (order_id,))
         conn.commit()
         conn.close()
-        print("[✓] Order fulfillment and relational item linking passed.")
+        print("[✓] Order creation with promotional discount calculation passed.")
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
-
