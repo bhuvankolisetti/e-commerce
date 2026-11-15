@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amazon Clone | Product Details</title>
+  <link rel="stylesheet" href="static/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header>
+    <div class="navbar-top">
+      <a href="index.html" class="nav-logo">
+        <span class="brand-text">amazon<span class="brand-accent">.in</span></span>
+      </a>
+
+      <div class="nav-deliver" onclick="window.location.href='checkout.html'">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        <div>
+          <div class="nav-deliver-line1">Deliver to Bhuvan</div>
+          <div class="nav-deliver-line2">Hyderabad 500081</div>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <form class="nav-search-container" id="navSearchForm" onsubmit="handleNavSearch(event)">
+        <select class="search-select" id="searchCategorySelect">
+          <option value="All">All Departments</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Fashion">Fashion</option>
+          <option value="Home & Kitchen">Home & Kitchen</option>
+          <option value="Books">Books</option>
+        </select>
+        <div style="flex: 1; position: relative;">
+          <input type="text" class="search-input" id="navSearchInput" placeholder="Search Amazon products, brands, and deals..." autocomplete="off">
+          <div id="searchSuggestionsBox" class="suggestions-box"></div>
+        </div>
+        <button type="submit" class="search-btn" title="Search">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
+        </button>
+      </form>
+
+      <div class="nav-right">
+        <a href="login.html" class="nav-item">
+          <span class="nav-line1" id="navAccountName">Hello, sign in</span>
+          <span class="nav-line2">Account & Lists ▾</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+          <span class="nav-line1">Returns</span>
+          <span class="nav-line2">& Orders</span>
+        </a>
+        <a href="cart.html" class="nav-item nav-cart">
+          <div class="cart-icon-wrapper">
+            <span class="cart-count" id="navCartCount">0</span>
+            <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+          </div>
+          <span class="nav-line2" style="margin-top: 10px;">Cart</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Subnav -->
+    <div class="navbar-sub">
+      <a href="index.html" class="subnav-link">☰ All</a>
+      <a href="deals.html" class="subnav-link">🔥 Today's Deals</a>
+      <a href="index.html?category=Electronics" class="subnav-link">Electronics</a>
+      <a href="index.html?category=Fashion" class="subnav-link">Fashion & Clothing</a>
+      <a href="index.html?category=Home%20%26%20Kitchen" class="subnav-link">Home & Kitchen</a>
+      <a href="index.html?category=Books" class="subnav-link">Books & Study</a>
+      <a href="cart.html" class="subnav-link">🛒 Cart</a>
+      <a href="orders.html" class="subnav-link">📦 My Orders</a>
+      <a href="admin.html" class="subnav-link admin-link">⚙️ Seller / Admin Portal</a>
+    </div>
+  </header>
+
+  <main class="page-container" style="max-width: 1400px; margin: 20px auto; padding: 0 20px;">
+    <!-- Breadcrumbs -->
+    <div id="productBreadcrumb" class="breadcrumb" style="font-size: 13px; color: #565959; margin-bottom: 16px;">
+      <a href="index.html" style="color: var(--amz-link); text-decoration: none;">Home</a> &gt; 
+      <span id="breadcrumbCategory">Department</span> &gt; 
+      <span id="breadcrumbTitle" style="color: #0f1111; font-weight: 600;">Product</span>
+    </div>
+
+    <div id="productDetailContainer" class="product-page-layout"></div>
+
+    <!-- Related Products -->
+    <div style="margin-top: 40px; background: #fff; padding: 24px; border-radius: 6px; border: 1px solid #e7e7e7;">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">Customers who viewed this item also bought</h3>
+      <div id="relatedProductsGrid" class="products-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Back to top</div>
+    <div class="footer-bottom">
+      <p>Final Year Academic Project: Amazon Clone Full-Stack E-Commerce Web Application</p>
+      <p>Developed with ❤️ by <strong>Bhuvan Kolisetti</strong> | <a href="https://github.com/bhuvankolisetti/e-commerce" style="color: var(--amz-yellow);" target="_blank">GitHub Repository</a></p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="static/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      let productId = parseInt(urlParams.get('id') || '1');
+      loadProductPage(productId);
+    });
+
+    function loadProductPage(productId) {
+      const p = STATIC_CATALOG.find(it => it.id === productId) || STATIC_CATALOG[0];
+
+      document.title = `${p.title} | Amazon Clone`;
+      document.getElementById('breadcrumbCategory').textContent = p.category;
+      document.getElementById('breadcrumbTitle').textContent = p.title.substring(0, 50) + '...';
+
+      const starString = '★'.repeat(Math.floor(p.rating)) + '☆'.repeat(5 - Math.floor(p.rating));
+      const featuresHtml = (p.features && p.features.length)
+        ? p.features.map(f => `<li>${escapeHtml(f)}</li>`).join('')
+        : '<li>High quality genuine product with official manufacturer warranty.</li>';
+
+      // Load reviews from localStorage or fallback
+      const storedReviews = JSON.parse(localStorage.getItem(`amz_reviews_${p.id}`) || '[]');
+      const defaultReviews = [
+        { user: 'Alex M. (Verified Purchase)', rating: 5, comment: 'Incredible product! Superior performance and build quality. Highly recommended.' },
+        { user: 'Sarah C.', rating: 4.5, comment: 'Arrived the next day via Prime delivery. Exceeded expectations.' }
+      ];
+      const allReviews = [...storedReviews, ...defaultReviews];
+
+      document.getElementById('productDetailContainer').innerHTML = `
+        <div class="product-page-grid" style="display: grid; grid-template-columns: 1.1fr 1.3fr 0.9fr; gap: 30px; background: #fff; padding: 24px; border-radius: 6px; border: 1px solid #e7e7e7;">
+          
+          <div class="product-gallery">
+            <div style="border: 1px solid #eee; border-radius: 8px; padding: 20px; text-align: center; background: #fff; min-height: 400px; display: flex; align-items: center; justify-content: center;">
+              <img id="mainGalleryImg" src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.title)}" style="max-width: 100%; max-height: 380px; object-fit: contain;">
+            </div>
+          </div>
+
+          <div class="product-center-info">
+            <div style="font-size: 13px; color: var(--amz-link); margin-bottom: 4px;">Visit the Amazon Brand Store</div>
+            <h1 style="font-size: 22px; font-weight: 700; line-height: 1.3; margin-bottom: 8px;">${escapeHtml(p.title)}</h1>
+            
+            <div class="product-rating" style="margin-bottom: 12px;">
+              <span class="stars" style="font-size: 16px;">${starString}</span>
+              <span style="font-weight: 700; margin-left: 6px;">${p.rating} out of 5</span>
+              <a href="#customerReviews" style="color: var(--amz-link); margin-left: 10px; text-decoration: none;">${p.rating_count.toLocaleString()} ratings</a>
+            </div>
+
+            ${p.badge ? `<div style="display: inline-block; background: var(--amz-orange); color: #fff; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 3px; margin-bottom: 12px;">${escapeHtml(p.badge)}</div>` : ''}
+
+            <hr style="border: none; border-top: 1px solid #e7e7e7; margin: 12px 0;">
+
+            <div class="product-pricing">
+              <div style="font-size: 28px; font-weight: 700; color: var(--amz-red);">
+                <span style="font-size: 16px; position: relative; top: -8px;">$</span>${p.price.toFixed(2)}
+                <span style="font-size: 14px; color: #565959; font-weight: 400; margin-left: 8px;">
+                  List Price: <span style="text-decoration: line-through;">$${p.original_price.toFixed(2)}</span> (-${p.discount_pct}%)
+                </span>
+              </div>
+              ${p.prime_eligible ? `
+                <div class="prime-badge" style="margin: 8px 0; font-size: 13px;">
+                  <span class="prime-icon">prime</span>
+                  <span>Fast, FREE Delivery on eligible orders</span>
+                </div>
+              ` : ''}
+            </div>
+
+            <div style="margin: 16px 0;">
+              <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">About this item</h4>
+              <ul class="features-list" style="padding-left: 20px; font-size: 14px; line-height: 1.6; color: #333;">
+                ${featuresHtml}
+              </ul>
+            </div>
+
+            <div style="font-size: 13px; color: #565959; line-height: 1.5; margin-top: 16px;">
+              <strong>Description:</strong> ${escapeHtml(p.description)}
+            </div>
+          </div>
+
+          <div class="product-buybox" style="border: 1px solid #d5d9d9; border-radius: 8px; padding: 20px; background: #fff; height: fit-content;">
+            <div style="font-size: 24px; font-weight: 700; color: var(--amz-red); margin-bottom: 8px;">
+              $${p.price.toFixed(2)}
+            </div>
+            <div style="font-size: 13px; color: #007185; margin-bottom: 10px;">
+              FREE Delivery <strong>Tomorrow, 8 PM</strong>
+            </div>
+            <div style="font-size: 17px; font-weight: 700; color: var(--amz-green); margin-bottom: 16px;">
+              ✓ In Stock
+            </div>
+
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label style="font-size: 13px; font-weight: 600;">Quantity:</label>
+              <select id="buyQty" class="form-control" style="width: 90px; padding: 6px;">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+
+            <button class="btn-add-cart" style="width: 100%; padding: 12px; margin-bottom: 10px;" onclick="addCurrentProductToCart(${p.id})">
+              Add to Cart
+            </button>
+            <button class="btn-buy-now" style="width: 100%; padding: 12px; margin-bottom: 14px;" onclick="buyCurrentProductNow(${p.id})">
+              Buy Now
+            </button>
+
+            <div style="font-size: 12px; color: #565959; margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px;">
+              <div>Ships from: <strong>Amazon Logistics</strong></div>
+              <div>Sold by: <strong>Amazon Retail Verified</strong></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Customer Reviews -->
+        <div id="customerReviews" style="display: grid; grid-template-columns: 1fr 2fr; gap: 40px; margin-top: 40px; background: #fff; padding: 28px; border-radius: 6px; border: 1px solid #e7e7e7;">
+          <div>
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Customer Reviews</h3>
+            <div class="product-rating" style="margin-bottom: 16px;">
+              <span class="stars" style="font-size: 20px;">${starString}</span>
+              <span style="font-size: 18px; font-weight: 700; margin-left: 8px;">${p.rating} out of 5</span>
+            </div>
+            <div style="font-size: 13px; color: #565959; margin-bottom: 20px;">
+              ${p.rating_count.toLocaleString()} global ratings
+            </div>
+          </div>
+
+          <div>
+            <div style="background: #f7fafa; border: 1px solid #d5d9d9; border-radius: 6px; padding: 18px; margin-bottom: 28px;">
+              <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">Write a Customer Review</h4>
+              <form onsubmit="submitProductReview(event, ${p.id})">
+                <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                  <input type="text" id="revName" class="form-control" placeholder="Your Name" value="Bhuvan Kolisetti" required style="flex: 1;">
+                  <select id="revRating" class="form-control" style="width: 140px;">
+                    <option value="5">★★★★★ (5.0)</option>
+                    <option value="4">★★★★☆ (4.0)</option>
+                    <option value="3">★★★☆☆ (3.0)</option>
+                  </select>
+                </div>
+                <textarea id="revComment" class="form-control" rows="3" placeholder="What did you like or dislike? How does it compare?" required style="margin-bottom: 12px;"></textarea>
+                <button type="submit" class="btn-add-cart" style="padding: 8px 24px;">Submit Review</button>
+              </form>
+            </div>
+
+            <h4 style="font-size: 17px; font-weight: 700; margin-bottom: 16px;">Customer Testimonials</h4>
+            <div>
+              ${allReviews.map(r => `
+                <div style="border-bottom: 1px solid #eee; padding-bottom: 14px; margin-bottom: 14px;">
+                  <div style="font-weight: 700; font-size: 13px;">👤 ${escapeHtml(r.user || r.user_name)}</div>
+                  <div style="color: #ffa41c; margin: 3px 0;">${'★'.repeat(Math.floor(r.rating))}</div>
+                  <div style="font-size: 14px; color: #333;">${escapeHtml(r.comment)}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Related products
+      const related = STATIC_CATALOG.filter(it => it.category === p.category && it.id !== p.id).slice(0, 4);
+      document.getElementById('relatedProductsGrid').innerHTML = related.map(item => `
+        <div class="product-card">
+          <a href="product.html?id=${item.id}" style="text-decoration: none; color: inherit;">
+            <div class="product-img-box">
+              <img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.title)}">
+            </div>
+            <h4 class="product-title" style="font-size: 13px;">${escapeHtml(item.title)}</h4>
+            <div class="price-row">
+              <span class="price-whole" style="font-size: 18px;">$${item.price.toFixed(2)}</span>
+            </div>
+          </a>
+          <button class="btn-add-cart" style="margin-top: 8px;" onclick="addToCartById(${item.id})">Add to Cart</button>
+        </div>
+      `).join('');
+    }
+
+    function addCurrentProductToCart(productId) {
+      const qty = parseInt(document.getElementById('buyQty')?.value || '1');
+      for (let i = 0; i < qty; i++) {
+        addToCartById(productId);
+      }
+    }
+
+    function buyCurrentProductNow(productId) {
+      addCurrentProductToCart(productId);
+      window.location.href = 'checkout.html';
+    }
+
+    function submitProductReview(e, productId) {
+      e.preventDefault();
+      const user = document.getElementById('revName').value.trim();
+      const rating = parseFloat(document.getElementById('revRating').value);
+      const comment = document.getElementById('revComment').value.trim();
+
+      const saved = JSON.parse(localStorage.getItem(`amz_reviews_${productId}`) || '[]');
+      saved.unshift({ user, rating, comment });
+      localStorage.setItem(`amz_reviews_${productId}`, JSON.stringify(saved));
+
+      showToast('Thank you! Your customer review was posted.', 'success');
+      loadProductPage(productId);
+    }
+  </script>
+</body>
+</html>
