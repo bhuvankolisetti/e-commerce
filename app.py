@@ -20,7 +20,7 @@ from database import get_db, init_db, hash_password
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
-PORT = 5000
+PORT = int(os.environ.get('PORT', 5000))
 
 class AmazonRequestHandler(BaseHTTPRequestHandler):
 
