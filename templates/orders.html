@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amazon Clone | Your Orders & Tracking</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header>
+    <div class="navbar-top">
+      <a href="/" class="nav-logo">
+        <span class="brand-text">amazon<span class="brand-accent">.in</span></span>
+      </a>
+
+      <div class="nav-deliver" onclick="window.location.href='/checkout'">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        <div>
+          <div class="nav-deliver-line1">Deliver to Bhuvan</div>
+          <div class="nav-deliver-line2">Hyderabad 500081</div>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <form class="nav-search-container" id="navSearchForm" onsubmit="handleNavSearch(event)">
+        <select class="search-select" id="searchCategorySelect">
+          <option value="All">All Departments</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Fashion">Fashion</option>
+          <option value="Home & Kitchen">Home & Kitchen</option>
+          <option value="Books">Books</option>
+        </select>
+        <div style="flex: 1; position: relative;">
+          <input type="text" class="search-input" id="navSearchInput" placeholder="Search Amazon products, brands, and deals..." autocomplete="off">
+          <div id="searchSuggestionsBox" class="suggestions-box"></div>
+        </div>
+        <button type="submit" class="search-btn" title="Search">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
+        </button>
+      </form>
+
+      <div class="nav-right">
+        <a href="/login" class="nav-item">
+          <span class="nav-line1" id="navAccountName">Hello, sign in</span>
+          <span class="nav-line2">Account & Lists ▾</span>
+        </a>
+        <a href="/orders" class="nav-item" style="border-color: #fff;">
+          <span class="nav-line1">Returns</span>
+          <span class="nav-line2">& Orders</span>
+        </a>
+        <a href="/cart" class="nav-item nav-cart">
+          <div class="cart-icon-wrapper">
+            <span class="cart-count" id="navCartCount">0</span>
+            <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+          </div>
+          <span class="nav-line2" style="margin-top: 10px;">Cart</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Subnav -->
+    <div class="navbar-sub">
+      <a href="/" class="subnav-link">☰ All</a>
+      <a href="/deals" class="subnav-link">🔥 Today's Deals</a>
+      <a href="/?category=Electronics" class="subnav-link">Electronics</a>
+      <a href="/?category=Fashion" class="subnav-link">Fashion & Clothing</a>
+      <a href="/?category=Home%20%26%20Kitchen" class="subnav-link">Home & Kitchen</a>
+      <a href="/?category=Books" class="subnav-link">Books & Study</a>
+      <a href="/cart" class="subnav-link">🛒 Cart</a>
+      <a href="/orders" class="subnav-link active">📦 My Orders</a>
+      <a href="/admin" class="subnav-link admin-link">⚙️ Seller / Admin Portal</a>
+    </div>
+  </header>
+
+  <!-- Orders Container -->
+  <main class="page-container" style="max-width: 1100px; margin: 24px auto; padding: 0 20px;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+      <h1 style="font-size: 28px; font-weight: 600;">Your Orders</h1>
+      <div style="display: flex; gap: 10px;">
+        <input type="text" id="orderSearchInput" class="form-control" placeholder="Search all orders by keyword or order ID" style="width: 320px;" oninput="filterOrdersList()">
+        <select class="form-control" style="width: 140px;">
+          <option>past 3 months</option>
+          <option>2026</option>
+          <option>archived</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Orders Filter Tabs -->
+    <div class="tabs-nav" style="margin-bottom: 20px;">
+      <button class="tab-btn active" onclick="switchOrderTab('all')">Orders</button>
+      <button class="tab-btn" onclick="switchOrderTab('buy_again')">Buy Again</button>
+      <button class="tab-btn" onclick="switchOrderTab('not_shipped')">Not Yet Shipped</button>
+      <button class="tab-btn" onclick="switchOrderTab('cancelled')">Cancelled Orders</button>
+    </div>
+
+    <div id="ordersContainer">
+      <div style="text-align: center; padding: 60px; color: #666;">
+        Fetching your order history...
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Tracking Modal Overlay -->
+  <div class="modal-overlay" id="trackingModal">
+    <div class="modal-card" style="max-width: 600px;">
+      <button class="modal-close-btn" onclick="closeModal('trackingModal')">✕</button>
+      <div id="trackingModalContent"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="margin-top: 80px;">
+    <div class="footer-back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Back to top</div>
+    <div class="footer-bottom">
+      <p>Final Year Academic Project: Amazon Clone Full-Stack E-Commerce Web Application</p>
+      <p>Developed with ❤️ by <strong>Bhuvan Kolisetti</strong> | <a href="https://github.com/bhuvankolisetti/e-commerce" style="color: var(--amz-yellow);" target="_blank">GitHub Repository</a></p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="/static/js/app.js"></script>
+  <script>
+    let allOrdersCache = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchOrdersPage();
+    });
+
+    async function fetchOrdersPage() {
+      const container = document.getElementById('ordersContainer');
+      const userId = state.currentUser ? state.currentUser.id : null;
+      const url = userId ? `/api/orders?user_id=${userId}` : '/api/orders';
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.success && data.orders.length) {
+          allOrdersCache = data.orders;
+          renderOrders(data.orders);
+        } else {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 60px; background: #fff; border-radius: 8px; border: 1px solid #d5d9d9;">
+              <h3 style="font-size: 20px; margin-bottom: 8px;">No orders found</h3>
+              <p style="color: #666; font-size: 14px; margin-bottom: 20px;">You haven't placed any orders in this time period.</p>
+              <a href="/" class="btn-add-cart" style="display: inline-block; padding: 10px 24px; text-decoration: none;">Start Shopping</a>
+            </div>
+          `;
+        }
+      } catch (err) {
+        container.innerHTML = '<div style="color: red; text-align: center; padding: 40px;">Error loading orders.</div>';
+      }
+    }
+
+    function renderOrders(orders) {
+      const container = document.getElementById('ordersContainer');
+      if (!orders.length) {
+        container.innerHTML = '<div style="text-align: center; padding: 40px; background: #fff;">No matching orders found.</div>';
+        return;
+      }
+
+      container.innerHTML = orders.map(order => {
+        const isDelivered = order.status === 'Delivered';
+        const isShipped = order.status === 'Shipped';
+
+        return `
+          <div style="border: 1px solid #d5d9d9; border-radius: 8px; background: #fff; margin-bottom: 20px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+            
+            <!-- Order Header Bar -->
+            <div style="background: #f0f2f2; padding: 14px 20px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; font-size: 13px; border-bottom: 1px solid #d5d9d9;">
+              <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                <div>
+                  <div style="color: #565959; text-transform: uppercase; font-size: 11px;">Order Placed</div>
+                  <div style="font-weight: 700;">${new Date(order.created_at).toLocaleDateString()}</div>
+                </div>
+                <div>
+                  <div style="color: #565959; text-transform: uppercase; font-size: 11px;">Total</div>
+                  <div style="font-weight: 700; color: var(--amz-red);">$${order.total_amount.toFixed(2)}</div>
+                </div>
+                <div>
+                  <div style="color: #565959; text-transform: uppercase; font-size: 11px;">Ship To</div>
+                  <div style="font-weight: 700; color: var(--amz-link); cursor: pointer;" title="${escapeHtml(order.shipping_address)}">
+                    ${escapeHtml(order.customer_name)} ▾
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div style="color: #565959; text-transform: uppercase; font-size: 11px;">Order # ${order.order_number}</div>
+                <a href="#" onclick="window.print(); return false;" style="color: var(--amz-link); text-decoration: none; font-size: 12px;">View invoice</a>
+              </div>
+            </div>
+
+            <!-- Order Body -->
+            <div style="padding: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div style="font-size: 18px; font-weight: 700;">
+                  ${isDelivered ? '✅ Delivered' : isShipped ? '🚚 Shipped - In Transit' : '⏱️ Arriving Tomorrow by 8 PM'}
+                </div>
+                <span style="display: inline-block; padding: 3px 10px; border-radius: 12px; font-weight: 700; font-size: 12px; background: ${isDelivered ? '#e6f4ea' : '#fff3e0'}; color: ${isDelivered ? '#137333' : '#e65100'};">
+                  ● ${order.status}
+                </span>
+              </div>
+
+              <!-- Package items -->
+              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                <div>
+                  ${(order.items || []).map(item => `
+                    <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                      <a href="/product?id=${item.product_id}" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1px solid #eee; border-radius: 4px;">
+                        <img src="${escapeHtml(item.product_image)}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                      </a>
+                      <div style="flex: 1;">
+                        <a href="/product?id=${item.product_id}" style="font-size: 15px; font-weight: 600; color: var(--amz-link); text-decoration: none;">
+                          ${escapeHtml(item.product_title)}
+                        </a>
+                        <div style="font-size: 12px; color: #565959; margin-top: 4px;">Qty: ${item.quantity} | Unit Price: $${item.unit_price.toFixed(2)}</div>
+                        <div style="margin-top: 8px;">
+                          <button class="btn-add-cart" style="padding: 4px 14px; font-size: 12px;" onclick="addToCartById(${item.product_id})">Buy it again</button>
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+
+                <!-- Action side buttons -->
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <button class="btn-checkout" style="padding: 8px; font-size: 13px;" onclick="showOrderTrackingModal('${order.order_number}', '${order.status}')">
+                    Track package
+                  </button>
+                  <button class="btn-add-cart" style="padding: 8px; font-size: 13px;" onclick="window.print()">
+                    🖨️ Print Invoice Receipt
+                  </button>
+                  <button class="btn-add-cart" style="padding: 8px; font-size: 13px;" onclick="window.location.href='/product?id=${order.items && order.items[0] ? order.items[0].product_id : 1}#customerReviews'">
+                    Write a product review
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showOrderTrackingModal(orderNumber, status) {
+      const modal = document.getElementById('trackingModal');
+      const content = document.getElementById('trackingModalContent');
+      
+      const step1 = true;
+      const step2 = status === 'Shipped' || status === 'Delivered';
+      const step3 = status === 'Delivered';
+
+      content.innerHTML = `
+        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 6px;">Tracking Details</h3>
+        <div style="color: #565959; font-size: 13px; margin-bottom: 20px;">Order # ${orderNumber} • Amazon Logistics</div>
+
+        <div style="background: #f7fafa; border: 1px solid #d5d9d9; border-radius: 6px; padding: 20px; margin-bottom: 20px;">
+          
+          <!-- Visual Timeline Bar -->
+          <div style="display: flex; justify-content: space-between; position: relative; margin-bottom: 30px;">
+            <div style="position: absolute; top: 14px; left: 10%; width: 80%; height: 4px; background: #ddd; z-index: 1;">
+              <div style="height: 100%; background: var(--amz-green); width: ${step3 ? '100%' : step2 ? '50%' : '15%'};"></div>
+            </div>
+
+            <div style="text-align: center; position: relative; z-index: 2;">
+              <div style="width: 30px; height: 30px; border-radius: 50%; background: var(--amz-green); color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px auto; font-weight: 700;">✓</div>
+              <span style="font-size: 12px; font-weight: 700;">Ordered</span>
+            </div>
+
+            <div style="text-align: center; position: relative; z-index: 2;">
+              <div style="width: 30px; height: 30px; border-radius: 50%; background: ${step2 ? 'var(--amz-green)' : '#ddd'}; color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px auto; font-weight: 700;">${step2 ? '✓' : '2'}</div>
+              <span style="font-size: 12px; font-weight: 700;">Shipped</span>
+            </div>
+
+            <div style="text-align: center; position: relative; z-index: 2;">
+              <div style="width: 30px; height: 30px; border-radius: 50%; background: ${step3 ? 'var(--amz-green)' : '#ddd'}; color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px auto; font-weight: 700;">${step3 ? '✓' : '3'}</div>
+              <span style="font-size: 12px; font-weight: 700;">Delivered</span>
+            </div>
+          </div>
+
+          <div style="font-size: 14px; line-height: 1.6;">
+            <div><strong>Carrier:</strong> Amazon Prime Air Delivery</div>
+            <div><strong>Tracking ID:</strong> AMZ-TRK-${Math.floor(Math.random() * 899999 + 100000)}</div>
+            <div><strong>Delivery Address:</strong> Hyderabad Hub Station</div>
+            <div><strong>Status:</strong> ${status} (On schedule)</div>
+          </div>
+        </div>
+
+        <button class="btn-checkout" style="width: 100%;" onclick="closeModal('trackingModal')">Close Tracking</button>
+      `;
+
+      modal.classList.add('open');
+    }
+
+    function filterOrdersList() {
+      const q = document.getElementById('orderSearchInput').value.trim().toLowerCase();
+      if (!q) {
+        renderOrders(allOrdersCache);
+        return;
+      }
+      const filtered = allOrdersCache.filter(o => 
+        o.order_number.toLowerCase().includes(q) || 
+        (o.items && o.items.some(it => it.product_title.toLowerCase().includes(q)))
+      );
+      renderOrders(filtered);
+    }
+
+    function switchOrderTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (tab === 'all') {
+        renderOrders(allOrdersCache);
+      } else if (tab === 'not_shipped') {
+        renderOrders(allOrdersCache.filter(o => o.status === 'Processing'));
+      } else {
+        renderOrders([]);
+      }
+    }
+  </script>
+</body>
+</html>
+
