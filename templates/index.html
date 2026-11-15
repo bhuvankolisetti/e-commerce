@@ -16,12 +16,12 @@
     <!-- Top Nav -->
     <div class="navbar-top">
       <!-- Logo -->
-      <div class="nav-logo" onclick="resetFilters()">
+      <a href="/" class="nav-logo">
         <span class="brand-text">amazon<span class="brand-accent">.in</span></span>
-      </div>
+      </a>
 
       <!-- Deliver to location -->
-      <div class="nav-deliver" onclick="openCheckoutModal()">
+      <div class="nav-deliver" onclick="window.location.href='/checkout'">
         <svg viewBox="0 0 24 24">
           <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
         </svg>
@@ -31,19 +31,22 @@
         </div>
       </div>
 
-      <!-- Search Bar -->
-      <form class="nav-search-container" id="navSearchForm">
-        <select class="search-select" id="searchCategorySelect">
+      <!-- Search Bar with Live Suggestions Dropdown -->
+      <form class="nav-search-container" id="navSearchForm" onsubmit="handleNavSearch(event)">
+        <select class="search-select" id="searchCategorySelect" onchange="filterByCategory(this.value)">
           <option value="All">All Departments</option>
           <option value="Electronics">Electronics</option>
           <option value="Fashion">Fashion</option>
           <option value="Home & Kitchen">Home & Kitchen</option>
           <option value="Books">Books</option>
         </select>
-        <input type="text" class="search-input" id="navSearchInput" placeholder="Search Amazon products, brands, and deals...">
+        <div style="flex: 1; position: relative;">
+          <input type="text" class="search-input" id="navSearchInput" placeholder="Search Amazon products, brands, and deals..." autocomplete="off">
+          <div id="searchSuggestionsBox" class="suggestions-box"></div>
+        </div>
         <button type="submit" class="search-btn" title="Search">
           <svg viewBox="0 0 24 24">
-            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/>
           </svg>
         </button>
       </form>
@@ -51,19 +54,19 @@
       <!-- Right Nav Items -->
       <div class="nav-right">
         <!-- Account / Sign In -->
-        <div class="nav-item" onclick="openAuthModal('login')">
+        <a href="/login" class="nav-item">
           <span class="nav-line1" id="navAccountName">Hello, sign in</span>
           <span class="nav-line2">Account & Lists ▾</span>
-        </div>
+        </a>
 
         <!-- Returns & Orders -->
-        <div class="nav-item" onclick="openOrdersModal()">
+        <a href="/orders" class="nav-item">
           <span class="nav-line1">Returns</span>
           <span class="nav-line2">& Orders</span>
-        </div>
+        </a>
 
         <!-- Cart -->
-        <div class="nav-item nav-cart" onclick="openCartDrawer()">
+        <a href="/cart" class="nav-item nav-cart">
           <div class="cart-icon-wrapper">
             <span class="cart-count" id="navCartCount">0</span>
             <svg viewBox="0 0 24 24">
@@ -71,22 +74,23 @@
             </svg>
           </div>
           <span class="nav-line2" style="margin-top: 10px;">Cart</span>
-        </div>
+        </a>
       </div>
     </div>
 
     <!-- Secondary Subnav -->
     <div class="navbar-sub">
       <div class="subnav-link" onclick="filterByCategory('All')">☰ All</div>
+      <a href="/deals" class="subnav-link">🔥 Today's Deals</a>
       <div class="subnav-link" onclick="filterByCategory('Electronics')">Electronics</div>
       <div class="subnav-link" onclick="filterByCategory('Fashion')">Fashion & Clothing</div>
       <div class="subnav-link" onclick="filterByCategory('Home & Kitchen')">Home & Kitchen</div>
       <div class="subnav-link" onclick="filterByCategory('Books')">Books & Study</div>
-      <div class="subnav-link" onclick="filterByCategory('All')">Today's Deals</div>
-      <div class="subnav-link" onclick="openOrdersModal()">Customer Service</div>
-      <div class="subnav-link admin-link" id="adminSubnavLink" onclick="openAdminModal()">
+      <a href="/cart" class="subnav-link">🛒 View Cart</a>
+      <a href="/orders" class="subnav-link">📦 My Orders</a>
+      <a href="/admin" class="subnav-link admin-link" id="adminSubnavLink">
         ⚙️ Seller / Admin Portal
-      </div>
+      </a>
     </div>
   </header>
 
@@ -188,13 +192,24 @@
         </div>
       </div>
 
-      <!-- Category Filter Pills -->
-      <div class="category-pills">
-        <button class="pill-btn active" data-category="All" onclick="filterByCategory('All')">All Products</button>
-        <button class="pill-btn" data-category="Electronics" onclick="filterByCategory('Electronics')">Electronics</button>
-        <button class="pill-btn" data-category="Fashion" onclick="filterByCategory('Fashion')">Fashion & Apparel</button>
-        <button class="pill-btn" data-category="Home & Kitchen" onclick="filterByCategory('Home & Kitchen')">Home & Kitchen</button>
-        <button class="pill-btn" data-category="Books" onclick="filterByCategory('Books')">Books & Study</button>
+      <!-- Category Filter Pills & Price Filters -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+        <div class="category-pills" style="margin-bottom: 0;">
+          <button class="pill-btn active" data-category="All" onclick="filterByCategory('All')">All Products</button>
+          <button class="pill-btn" data-category="Electronics" onclick="filterByCategory('Electronics')">Electronics (8)</button>
+          <button class="pill-btn" data-category="Fashion" onclick="filterByCategory('Fashion')">Fashion & Apparel (7)</button>
+          <button class="pill-btn" data-category="Home & Kitchen" onclick="filterByCategory('Home & Kitchen')">Home & Kitchen (6)</button>
+          <button class="pill-btn" data-category="Books" onclick="filterByCategory('Books')">Books & Study (5)</button>
+        </div>
+
+        <!-- Price Range Filter -->
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+          <span>Price:</span>
+          <input type="number" id="minPriceFilter" placeholder="Min $" style="width: 75px; padding: 4px 8px; border: 1px solid var(--amz-border); border-radius: 4px;">
+          <span>to</span>
+          <input type="number" id="maxPriceFilter" placeholder="Max $" style="width: 75px; padding: 4px 8px; border: 1px solid var(--amz-border); border-radius: 4px;">
+          <button onclick="loadProducts()" class="btn-add-cart" style="padding: 4px 12px; font-size: 12px;">Go</button>
+        </div>
       </div>
 
       <!-- Dynamic Product Grid -->
@@ -205,9 +220,7 @@
 
   </main>
 
-  <!-- ==============================================================
-       CART DRAWER (SLIDE-OUT PANEL)
-       ============================================================== -->
+  <!-- Slide-out Cart Drawer -->
   <div class="cart-drawer-overlay" id="cartDrawerOverlay"></div>
   <aside class="cart-drawer" id="cartDrawer">
     <div class="cart-drawer-header">
@@ -222,327 +235,23 @@
       </div>
     </div>
 
-    <div class="cart-items-list" id="cartItemsList">
-      <!-- Injected by app.js -->
-    </div>
+    <div class="cart-items-list" id="cartItemsList"></div>
 
     <div class="cart-drawer-footer">
       <div class="cart-subtotal-row">
         <span>Subtotal:</span>
         <span id="cartDrawerSubtotal">$0.00</span>
       </div>
-      <button class="btn-checkout" onclick="closeCartDrawer(); openCheckoutModal();">
-        Proceed to Checkout
+      <button class="btn-checkout" onclick="window.location.href='/cart'">
+        View Cart & Proceed to Buy
       </button>
     </div>
   </aside>
 
-  <!-- ==============================================================
-       PRODUCT DETAIL MODAL
-       ============================================================== -->
-  <div class="modal-overlay" id="productModal">
-    <div class="modal-card">
-      <button class="modal-close-btn" onclick="closeModal('productModal')">✕</button>
-      <div id="productModalContent">
-        <!-- Injected by app.js -->
-      </div>
-    </div>
-  </div>
-
-  <!-- ==============================================================
-       CHECKOUT MODAL (MULTI-STEP)
-       ============================================================== -->
-  <div class="modal-overlay" id="checkoutModal">
-    <div class="modal-card" style="max-width: 650px;">
-      <button class="modal-close-btn" onclick="closeModal('checkoutModal')">✕</button>
-      <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 16px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
-        🔒 Amazon Secure Checkout
-      </h2>
-
-      <form onsubmit="handleCheckoutSubmit(event)">
-        <!-- Section 1: Delivery Address -->
-        <h4 style="font-size: 15px; margin-bottom: 12px; color: var(--amz-orange);">1. Delivery Address</h4>
-        <div class="form-group">
-          <label class="form-label">Full Name</label>
-          <input type="text" id="checkoutName" class="form-control" placeholder="e.g. Bhuvan Kolisetti" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Email Address</label>
-          <input type="email" id="checkoutEmail" class="form-control" placeholder="e.g. bhuvan@amazon.com" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Street Address</label>
-          <input type="text" id="checkoutAddress" class="form-control" placeholder="Flat, House no., Building, Company, Apartment" required>
-        </div>
-        <div style="display: flex; gap: 12px;">
-          <div class="form-group" style="flex: 1;">
-            <label class="form-label">City</label>
-            <input type="text" id="checkoutCity" class="form-control" value="Hyderabad" required>
-          </div>
-          <div class="form-group" style="flex: 1;">
-            <label class="form-label">Postal / ZIP Code</label>
-            <input type="text" id="checkoutPostal" class="form-control" value="500081" required>
-          </div>
-        </div>
-
-        <!-- Section 2: Payment Method -->
-        <h4 style="font-size: 15px; margin: 16px 0 12px 0; color: var(--amz-orange);">2. Select a Payment Method</h4>
-        <div style="background: #f7fafa; border: 1px solid #d5d9d9; border-radius: 6px; padding: 12px; margin-bottom: 16px;">
-          <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer;">
-            <input type="radio" name="payment_method" value="Amazon Pay Balance" checked>
-            <span><strong>Amazon Pay Balance</strong> (Instant 1-Click Checkout)</span>
-          </label>
-          <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer;">
-            <input type="radio" name="payment_method" value="Credit/Debit Card">
-            <span>Credit or Debit Card (Visa, MasterCard, RuPay, Amex)</span>
-          </label>
-          <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer;">
-            <input type="radio" name="payment_method" value="UPI / QR Code">
-            <span>UPI / QR Code (Google Pay, PhonePe, Paytm)</span>
-          </label>
-          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-            <input type="radio" name="payment_method" value="Cash on Delivery">
-            <span>Cash on Delivery (Pay upon arrival)</span>
-          </label>
-        </div>
-
-        <!-- Section 3: Order Summary -->
-        <h4 style="font-size: 15px; margin-bottom: 10px; color: var(--amz-orange);">3. Review & Place Order</h4>
-        <div style="background: #fff; border: 1px solid #e7e7e7; border-radius: 6px; padding: 14px; margin-bottom: 16px; font-size: 14px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-            <span>Items:</span>
-            <span id="checkoutSubtotal">$0.00</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-            <span>Standard Shipping:</span>
-            <span id="checkoutShipping">$0.00</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-            <span>Estimated Tax (8%):</span>
-            <span id="checkoutTax">$0.00</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; color: var(--amz-red); border-top: 1px solid #ddd; padding-top: 8px; margin-top: 8px;">
-            <span>Order Total:</span>
-            <span id="checkoutTotal">$0.00</span>
-          </div>
-        </div>
-
-        <button type="submit" class="btn-checkout">
-          Place your order in USD
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ==============================================================
-       ORDER SUCCESS & INVOICE MODAL
-       ============================================================== -->
-  <div class="modal-overlay" id="orderSuccessModal">
-    <div class="modal-card" style="max-width: 500px;">
-      <button class="modal-close-btn" onclick="closeModal('orderSuccessModal')">✕</button>
-      <div id="orderSuccessDetails">
-        <!-- Rendered by app.js -->
-      </div>
-    </div>
-  </div>
-
-  <!-- ==============================================================
-       AUTHENTICATION MODAL (LOGIN / REGISTER)
-       ============================================================== -->
-  <div class="modal-overlay" id="authModal">
-    <div class="modal-card" style="max-width: 440px;">
-      <button class="modal-close-btn" onclick="closeModal('authModal')">✕</button>
-      
-      <div class="tabs-nav">
-        <button class="tab-btn active" id="loginFormTab" onclick="switchAuthTab('login')">Sign In</button>
-        <button class="tab-btn" id="registerFormTab" onclick="switchAuthTab('register')">Create Account</button>
-      </div>
-
-      <!-- Login Form -->
-      <div id="loginFormContainer">
-        <form onsubmit="handleLogin(event)">
-          <div class="form-group">
-            <label class="form-label">Email Address</label>
-            <input type="email" id="loginEmail" class="form-control" value="bhuvan@amazon.com" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Password</label>
-            <input type="password" id="loginPassword" class="form-control" value="user123" required>
-          </div>
-          <button type="submit" class="btn-checkout" style="margin-bottom: 12px;">Sign in</button>
-        </form>
-
-        <div style="background: #f0f8ff; border: 1px solid #d0e7ff; border-radius: 4px; padding: 10px; font-size: 12px; margin-top: 10px;">
-          <strong>💡 Demo Accounts Pre-configured:</strong><br>
-          • <strong>Customer:</strong> bhuvan@amazon.com / user123<br>
-          • <strong>Admin:</strong> admin@amazon.com / admin123
-        </div>
-
-        <button class="btn-add-cart" style="width: 100%; margin-top: 12px;" onclick="handleLogout()">Sign Out Current User</button>
-      </div>
-
-      <!-- Register Form -->
-      <div id="registerFormContainer" style="display: none;">
-        <form onsubmit="handleRegister(event)">
-          <div class="form-group">
-            <label class="form-label">Your Name</label>
-            <input type="text" id="regName" class="form-control" placeholder="First and last name" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email Address</label>
-            <input type="email" id="regEmail" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Password (at least 6 characters)</label>
-            <input type="password" id="regPassword" class="form-control" minlength="6" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Delivery Address</label>
-            <input type="text" id="regAddress" class="form-control" placeholder="City, State, Country">
-          </div>
-          <button type="submit" class="btn-checkout">Create your Amazon account</button>
-        </form>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ==============================================================
-       MY ORDERS MODAL
-       ============================================================== -->
-  <div class="modal-overlay" id="ordersModal">
-    <div class="modal-card" style="max-width: 800px;">
-      <button class="modal-close-btn" onclick="closeModal('ordersModal')">✕</button>
-      <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-        📦 Your Orders & Package Tracking
-      </h2>
-      <div id="ordersListContainer">
-        <!-- Rendered by app.js -->
-      </div>
-    </div>
-  </div>
-
-  <!-- ==============================================================
-       ADMIN & SELLER MANAGEMENT MODAL
-       ============================================================== -->
-  <div class="modal-overlay" id="adminModal">
-    <div class="modal-card" style="max-width: 900px;">
-      <button class="modal-close-btn" onclick="closeModal('adminModal')">✕</button>
-      <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 16px; border-bottom: 2px solid var(--amz-orange); padding-bottom: 10px;">
-        ⚡ Amazon Seller Central & Admin Portal
-      </h2>
-
-      <!-- Metrics summary -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-val" id="statRevenue">$0</div>
-          <div class="stat-label">Total Revenue</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-val" id="statOrders">0</div>
-          <div class="stat-label">Orders Placed</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-val" id="statProducts">0</div>
-          <div class="stat-label">Active Products</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-val" id="statUsers">0</div>
-          <div class="stat-label">Registered Customers</div>
-        </div>
-      </div>
-
-      <!-- Add New Product Form -->
-      <div style="background: #f7fafa; border: 1px solid #d5d9d9; border-radius: 6px; padding: 18px; margin-bottom: 24px;">
-        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Add New Product to Store</h3>
-        <form id="addProductForm" onsubmit="handleAddProduct(event)">
-          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 10px;">
-            <div>
-              <label class="form-label">Product Title</label>
-              <input type="text" id="newProdTitle" class="form-control" placeholder="e.g. Sony DualSense Wireless Controller" required>
-            </div>
-            <div>
-              <label class="form-label">Category</label>
-              <select id="newProdCategory" class="form-control">
-                <option value="Electronics">Electronics</option>
-                <option value="Fashion">Fashion</option>
-                <option value="Home & Kitchen">Home & Kitchen</option>
-                <option value="Books">Books</option>
-              </select>
-            </div>
-            <div>
-              <label class="form-label">Badge Tag</label>
-              <input type="text" id="newProdBadge" class="form-control" placeholder="Best Seller">
-            </div>
-          </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 12px; margin-bottom: 10px;">
-            <div>
-              <label class="form-label">Deal Price ($)</label>
-              <input type="number" step="0.01" id="newProdPrice" class="form-control" placeholder="69.99" required>
-            </div>
-            <div>
-              <label class="form-label">List Price ($)</label>
-              <input type="number" step="0.01" id="newProdOriginalPrice" class="form-control" placeholder="89.99">
-            </div>
-            <div>
-              <label class="form-label">Image URL</label>
-              <input type="url" id="newProdImage" class="form-control" placeholder="https://images.unsplash.com/..." required>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Product Description</label>
-            <textarea id="newProdDesc" class="form-control" rows="2" placeholder="Full technical specifications and description..." required></textarea>
-          </div>
-          <button type="submit" class="btn-checkout" style="padding: 10px 24px; font-size: 14px;">+ Add Product to Catalog</button>
-        </form>
-      </div>
-
-      <!-- Inventory Management Table -->
-      <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">Inventory Management</h3>
-      <div style="max-height: 250px; overflow-y: auto; border: 1px solid #e7e7e7; border-radius: 6px; margin-bottom: 24px;">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Img</th>
-              <th>Product Title</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="adminProductsTableBody"></tbody>
-        </table>
-      </div>
-
-      <!-- Orders Management Table -->
-      <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">Customer Orders Fulfillment</h3>
-      <div style="max-height: 250px; overflow-y: auto; border: 1px solid #e7e7e7; border-radius: 6px;">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody id="adminOrdersTableBody"></tbody>
-        </table>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ==============================================================
-       TOAST NOTIFICATIONS
-       ============================================================== -->
+  <!-- Toast Notifications -->
   <div id="toast" class="toast"></div>
 
-  <!-- ==============================================================
-       AMAZON-STYLE FOOTER
-       ============================================================== -->
+  <!-- Amazon-Style Footer -->
   <footer>
     <div class="footer-back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
       Back to top
@@ -552,37 +261,34 @@
         <div class="footer-col">
           <h4>Get to Know Us</h4>
           <ul>
-            <li><a href="#">About Amazon Clone</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="#">Press Releases</a></li>
-            <li><a href="#">Amazon Science</a></li>
+            <li><a href="/deals">Today's Deals</a></li>
+            <li><a href="/?category=Electronics">Electronics Department</a></li>
+            <li><a href="/?category=Fashion">Fashion & Apparel</a></li>
+            <li><a href="/?category=Books">Bestselling Books</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4>Connect with Us</h4>
           <ul>
             <li><a href="https://github.com/bhuvankolisetti/e-commerce" target="_blank">GitHub Repository</a></li>
-            <li><a href="#">LinkedIn</a></li>
-            <li><a href="#">Twitter</a></li>
-            <li><a href="#">Instagram</a></li>
+            <li><a href="/orders">Order History & Tracking</a></li>
+            <li><a href="/cart">Your Shopping Cart</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4>Make Money with Us</h4>
           <ul>
-            <li><a href="#" onclick="openAdminModal()">Sell on Amazon</a></li>
-            <li><a href="#">Protect and Build Your Brand</a></li>
-            <li><a href="#">Amazon Global Selling</a></li>
-            <li><a href="#">Become an Affiliate</a></li>
+            <li><a href="/admin">Seller Central & Admin Portal</a></li>
+            <li><a href="/admin">Manage Inventory (CRUD)</a></li>
+            <li><a href="/admin">Order Fulfillment Tracking</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4>Let Us Help You</h4>
           <ul>
-            <li><a href="#" onclick="openAuthModal('login')">Your Account</a></li>
-            <li><a href="#" onclick="openOrdersModal()">Returns Centre</a></li>
-            <li><a href="#">100% Purchase Protection</a></li>
-            <li><a href="#">Help & FAQs</a></li>
+            <li><a href="/login">Your Account</a></li>
+            <li><a href="/orders">Returns & Orders</a></li>
+            <li><a href="/checkout">100% Purchase Protection</a></li>
           </ul>
         </div>
       </div>
@@ -590,11 +296,10 @@
     <div class="footer-bottom">
       <p>Final Year Academic Project: Full-Stack Amazon Clone E-Commerce Web Application</p>
       <p>Developed with ❤️ by <strong>Bhuvan Kolisetti</strong> | Source Code: <a href="https://github.com/bhuvankolisetti/e-commerce" style="color: var(--amz-yellow);" target="_blank">github.com/bhuvankolisetti/e-commerce</a></p>
-      <p style="margin-top: 6px; color: #777;">© 2026 Amazon Clone, Inc. or its affiliates. Built for educational & final year demonstration purposes.</p>
+      <p style="margin-top: 6px; color: #777;">© 2026 Amazon Clone, Inc. Built for educational & final year capstone evaluation.</p>
     </div>
   </footer>
 
   <script src="/static/js/app.js"></script>
 </body>
 </html>
-
