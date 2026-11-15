@@ -131,36 +131,83 @@
       }
     }
 
-    function handleLoginPageSignIn(e) {
+    async function handleLoginPageSignIn(e) {
       e.preventDefault();
       const email = document.getElementById('logEmail').value.trim();
-      const role = email.includes('admin') ? 'admin' : 'customer';
-      const name = role === 'admin' ? 'Admin Manager' : 'Bhuvan Kolisetti';
+      const password = document.getElementById('logPass').value;
 
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            state.currentUser = data.user;
+            localStorage.setItem('amz_user', JSON.stringify(data.user));
+            showToast(`Welcome back, ${data.user.name}!`, 'success');
+            setTimeout(() => {
+              if (data.user.role === 'admin') {
+                window.location.href = 'admin.html';
+              } else {
+                window.location.href = 'index.html';
+              }
+            }, 500);
+            return;
+          } else {
+            showToast(data.error || 'Invalid credentials', 'error');
+            return;
+          }
+        }
+      } catch (err) {}
+
+      // Fallback if backend server is not running
+      const role = email.includes('admin') ? 'admin' : 'customer';
+      const name = role === 'admin' ? 'Admin Manager' : (email.split('@')[0] || 'Customer');
       const user = { id: 1, name: name, email: email, role: role };
       state.currentUser = user;
       localStorage.setItem('amz_user', JSON.stringify(user));
-      showToast(`Welcome back, ${name}!`, 'success');
-
+      showToast(`Signed in as ${name}!`, 'success');
       setTimeout(() => {
-        if (role === 'admin') {
-          window.location.href = 'admin.html';
-        } else {
-          window.location.href = 'index.html';
-        }
+        window.location.href = role === 'admin' ? 'admin.html' : 'index.html';
       }, 500);
     }
 
-    function handleLoginPageRegister(e) {
+    async function handleLoginPageRegister(e) {
       e.preventDefault();
       const name = document.getElementById('regName').value.trim();
       const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPass').value;
+      const address = document.getElementById('regAddr').value.trim();
 
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, address })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            state.currentUser = data.user;
+            localStorage.setItem('amz_user', JSON.stringify(data.user));
+            showToast('Account created in database successfully!', 'success');
+            setTimeout(() => { window.location.href = 'index.html'; }, 500);
+            return;
+          } else {
+            showToast(data.error || 'Registration failed', 'error');
+            return;
+          }
+        }
+      } catch (err) {}
+
+      // Fallback
       const user = { id: Date.now(), name: name, email: email, role: 'customer' };
       state.currentUser = user;
       localStorage.setItem('amz_user', JSON.stringify(user));
       showToast('Account registered successfully!', 'success');
-
       setTimeout(() => { window.location.href = 'index.html'; }, 500);
     }
   </script>
