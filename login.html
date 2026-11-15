@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amazon Clone | Sign In</title>
+  <link rel="stylesheet" href="static/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+</head>
+<body style="background: #fff;">
+
+  <!-- Minimal Brand Header -->
+  <div style="text-align: center; padding: 24px 0 16px 0;">
+    <a href="index.html" style="text-decoration: none;">
+      <span class="brand-text" style="color: #0f1111; font-size: 32px;">amazon<span class="brand-accent" style="color: var(--amz-orange);">.in</span></span>
+    </a>
+  </div>
+
+  <main style="max-width: 360px; margin: 0 auto 40px auto; padding: 0 16px;">
+    <div style="border: 1px solid #d5d9d9; border-radius: 8px; padding: 24px 26px; margin-bottom: 22px;">
+      
+      <div class="tabs-nav" style="margin-bottom: 18px;">
+        <button class="tab-btn active" id="tabSignIn" onclick="showAuthTab('signin')">Sign In</button>
+        <button class="tab-btn" id="tabCreate" onclick="showAuthTab('create')">Create Account</button>
+      </div>
+
+      <!-- Sign In Form -->
+      <div id="signinSection">
+        <h2 style="font-size: 24px; font-weight: 500; margin-bottom: 16px;">Sign in</h2>
+        
+        <form onsubmit="handleLoginPageSignIn(event)">
+          <div class="form-group">
+            <label class="form-label">Email or mobile phone number</label>
+            <input type="email" id="logEmail" class="form-control" value="bhuvan@amazon.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="logPass" class="form-control" value="user123" required>
+          </div>
+
+          <button type="submit" class="btn-checkout" style="width: 100%; padding: 10px; margin-bottom: 16px;">
+            Sign in
+          </button>
+        </form>
+
+        <p style="font-size: 12px; color: #565959; line-height: 1.5; margin-bottom: 16px;">
+          By continuing, you agree to Amazon Clone's <a href="#" style="color: var(--amz-link);">Conditions of Use</a> and <a href="#" style="color: var(--amz-link);">Privacy Notice</a>.
+        </p>
+
+        <!-- 1-Click Demo Buttons -->
+        <div style="background: #f0f8ff; border: 1px solid #d0e7ff; border-radius: 6px; padding: 12px; font-size: 12px;">
+          <div style="font-weight: 700; margin-bottom: 8px;">💡 1-Click Demo Logins:</div>
+          <div style="display: flex; gap: 8px;">
+            <button onclick="fillDemo('customer')" style="flex: 1; padding: 6px; font-size: 11px; background: #fff; border: 1px solid #bbb; border-radius: 4px; cursor: pointer;">
+              👤 Customer
+            </button>
+            <button onclick="fillDemo('admin')" style="flex: 1; padding: 6px; font-size: 11px; background: #fff; border: 1px solid #bbb; border-radius: 4px; cursor: pointer;">
+              ⚙️ Admin
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Create Account Form -->
+      <div id="createSection" style="display: none;">
+        <h2 style="font-size: 24px; font-weight: 500; margin-bottom: 16px;">Create account</h2>
+        
+        <form onsubmit="handleLoginPageRegister(event)">
+          <div class="form-group">
+            <label class="form-label">Your name</label>
+            <input type="text" id="regName" class="form-control" placeholder="First and last name" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" id="regEmail" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="regPass" class="form-control" placeholder="At least 6 characters" minlength="6" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Delivery Address</label>
+            <input type="text" id="regAddr" class="form-control" placeholder="City, State, Country">
+          </div>
+
+          <button type="submit" class="btn-checkout" style="width: 100%; padding: 10px; margin-bottom: 16px;">
+            Create your Amazon account
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <div id="alreadyLoggedInBox" style="display: none; text-align: center; font-size: 13px; color: #555;">
+      Currently signed in as: <strong id="loggedInUsername"></strong><br>
+      <a href="#" onclick="handleLogout(); window.location.reload(); return false;" style="color: var(--amz-link); margin-top: 6px; display: inline-block;">
+        Sign out from this account
+      </a>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="static/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (state.currentUser) {
+        document.getElementById('alreadyLoggedInBox').style.display = 'block';
+        document.getElementById('loggedInUsername').textContent = state.currentUser.name;
+      }
+    });
+
+    function showAuthTab(tab) {
+      document.getElementById('tabSignIn').classList.toggle('active', tab === 'signin');
+      document.getElementById('tabCreate').classList.toggle('active', tab === 'create');
+      document.getElementById('signinSection').style.display = tab === 'signin' ? 'block' : 'none';
+      document.getElementById('createSection').style.display = tab === 'create' ? 'block' : 'none';
+    }
+
+    function fillDemo(role) {
+      if (role === 'admin') {
+        document.getElementById('logEmail').value = 'admin@amazon.com';
+        document.getElementById('logPass').value = 'admin123';
+      } else {
+        document.getElementById('logEmail').value = 'bhuvan@amazon.com';
+        document.getElementById('logPass').value = 'user123';
+      }
+    }
+
+    function handleLoginPageSignIn(e) {
+      e.preventDefault();
+      const email = document.getElementById('logEmail').value.trim();
+      const role = email.includes('admin') ? 'admin' : 'customer';
+      const name = role === 'admin' ? 'Admin Manager' : 'Bhuvan Kolisetti';
+
+      const user = { id: 1, name: name, email: email, role: role };
+      state.currentUser = user;
+      localStorage.setItem('amz_user', JSON.stringify(user));
+      showToast(`Welcome back, ${name}!`, 'success');
+
+      setTimeout(() => {
+        if (role === 'admin') {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'index.html';
+        }
+      }, 500);
+    }
+
+    function handleLoginPageRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+
+      const user = { id: Date.now(), name: name, email: email, role: 'customer' };
+      state.currentUser = user;
+      localStorage.setItem('amz_user', JSON.stringify(user));
+      showToast('Account registered successfully!', 'success');
+
+      setTimeout(() => { window.location.href = 'index.html'; }, 500);
+    }
+  </script>
+</body>
+</html>
