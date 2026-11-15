@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amazon Clone | Today's Deals</title>
+  <link rel="stylesheet" href="static/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header>
+    <div class="navbar-top">
+      <a href="index.html" class="nav-logo">
+        <span class="brand-text">amazon<span class="brand-accent">.in</span></span>
+      </a>
+
+      <div class="nav-deliver" onclick="window.location.href='checkout.html'">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        <div>
+          <div class="nav-deliver-line1">Deliver to Bhuvan</div>
+          <div class="nav-deliver-line2">Hyderabad 500081</div>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <form class="nav-search-container" id="navSearchForm" onsubmit="handleNavSearch(event)">
+        <select class="search-select" id="searchCategorySelect">
+          <option value="All">All Departments</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Fashion">Fashion</option>
+          <option value="Home & Kitchen">Home & Kitchen</option>
+          <option value="Books">Books</option>
+        </select>
+        <div style="flex: 1; position: relative;">
+          <input type="text" class="search-input" id="navSearchInput" placeholder="Search deals, brands, and savings..." autocomplete="off">
+          <div id="searchSuggestionsBox" class="suggestions-box"></div>
+        </div>
+        <button type="submit" class="search-btn" title="Search">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
+        </button>
+      </form>
+
+      <div class="nav-right">
+        <a href="login.html" class="nav-item">
+          <span class="nav-line1" id="navAccountName">Hello, sign in</span>
+          <span class="nav-line2">Account & Lists ▾</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+          <span class="nav-line1">Returns</span>
+          <span class="nav-line2">& Orders</span>
+        </a>
+        <a href="cart.html" class="nav-item nav-cart">
+          <div class="cart-icon-wrapper">
+            <span class="cart-count" id="navCartCount">0</span>
+            <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+          </div>
+          <span class="nav-line2" style="margin-top: 10px;">Cart</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Subnav -->
+    <div class="navbar-sub">
+      <a href="index.html" class="subnav-link">☰ All</a>
+      <a href="deals.html" class="subnav-link active">🔥 Today's Deals</a>
+      <a href="index.html?category=Electronics" class="subnav-link">Electronics</a>
+      <a href="index.html?category=Fashion" class="subnav-link">Fashion & Clothing</a>
+      <a href="index.html?category=Home%20%26%20Kitchen" class="subnav-link">Home & Kitchen</a>
+      <a href="index.html?category=Books" class="subnav-link">Books & Study</a>
+      <a href="cart.html" class="subnav-link">🛒 Cart</a>
+      <a href="orders.html" class="subnav-link">📦 My Orders</a>
+      <a href="admin.html" class="subnav-link admin-link">⚙️ Seller / Admin Portal</a>
+    </div>
+  </header>
+
+  <!-- Deals Hero Banner -->
+  <div style="background: linear-gradient(90deg, #131921 0%, #232f3e 100%); color: #fff; padding: 24px 20px; text-align: center;">
+    <span style="background: var(--amz-orange); color: #fff; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 4px; text-transform: uppercase;">Lightning Deals & Daily Steals</span>
+    <h1 style="font-size: 32px; font-weight: 800; margin: 10px 0;">Today's Exclusive Deals</h1>
+    <div style="display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 15px;">
+      <span>⏱️ Deals end in:</span>
+      <div id="countdownTimer" style="background: rgba(255,255,255,0.15); padding: 6px 16px; border-radius: 6px; font-family: monospace; font-size: 18px; font-weight: 700; color: var(--amz-yellow);">
+        06h : 42m : 18s
+      </div>
+    </div>
+  </div>
+
+  <main class="page-container" style="max-width: 1400px; margin: 24px auto; padding: 0 20px;">
+    <div class="category-pills" style="margin-bottom: 24px;">
+      <button class="pill-btn active" onclick="filterDeals('all')">All Deals</button>
+      <button class="pill-btn" onclick="filterDeals('Electronics')">Electronics (Up to 40% Off)</button>
+      <button class="pill-btn" onclick="filterDeals('Fashion')">Fashion & Shoes (Up to 45% Off)</button>
+      <button class="pill-btn" onclick="filterDeals('Home & Kitchen')">Home & Kitchen (Up to 35% Off)</button>
+      <button class="pill-btn" onclick="filterDeals('Books')">Books (Up to 30% Off)</button>
+    </div>
+
+    <div id="dealsGrid" class="products-grid"></div>
+  </main>
+
+  <footer>
+    <div class="footer-back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Back to top</div>
+    <div class="footer-bottom">
+      <p>Final Year Academic Project: Amazon Clone Full-Stack E-Commerce Web Application</p>
+      <p>Developed with ❤️ by <strong>Bhuvan Kolisetti</strong> | <a href="https://github.com/bhuvankolisetti/e-commerce" style="color: var(--amz-yellow);" target="_blank">GitHub Repository</a></p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="static/js/app.js"></script>
+  <script>
+    let dealsData = STATIC_CATALOG.filter(p => p.deal_of_day === 1 || p.discount_pct >= 20);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderDeals(dealsData);
+      startCountdownTimer();
+    });
+
+    function startCountdownTimer() {
+      let secondsRemaining = 6 * 3600 + 42 * 60 + 18;
+      const el = document.getElementById('countdownTimer');
+      setInterval(() => {
+        secondsRemaining--;
+        if (secondsRemaining <= 0) secondsRemaining = 86400;
+        const h = String(Math.floor(secondsRemaining / 3600)).padStart(2, '0');
+        const m = String(Math.floor((secondsRemaining % 3600) / 60)).padStart(2, '0');
+        const s = String(secondsRemaining % 60).padStart(2, '0');
+        if (el) el.textContent = `${h}h : ${m}m : ${s}s`;
+      }, 1000);
+    }
+
+    function renderDeals(deals) {
+      const grid = document.getElementById('dealsGrid');
+      if (!deals.length) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;">No deals found in this department.</div>';
+        return;
+      }
+
+      grid.innerHTML = deals.map(p => {
+        const claimedPct = 65;
+        const starString = '★'.repeat(Math.floor(p.rating)) + '☆'.repeat(5 - Math.floor(p.rating));
+
+        return `
+          <div class="product-card">
+            <span class="badge-tag">Deal of the Day</span>
+            <a href="product.html?id=${p.id}" style="text-decoration: none; color: inherit;">
+              <div class="product-img-box">
+                <img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.title)}">
+              </div>
+              <div class="product-category">${escapeHtml(p.category)}</div>
+              <h3 class="product-title">${escapeHtml(p.title)}</h3>
+              <div class="product-rating">
+                <span class="stars">${starString}</span>
+                <span class="rating-count">(${p.rating_count.toLocaleString()})</span>
+              </div>
+              <div class="price-row">
+                <span class="price-symbol">$</span>
+                <span class="price-whole">${p.price.toFixed(2)}</span>
+                <span class="mrp-strike">$${p.original_price.toFixed(2)}</span>
+                <span class="discount-badge">-${p.discount_pct}%</span>
+              </div>
+            </a>
+
+            <div style="margin: 8px 0;">
+              <div style="font-size: 11px; color: #565959; display: flex; justify-content: space-between; margin-bottom: 3px;">
+                <span>${claimedPct}% claimed</span>
+                <span style="color: var(--amz-red); font-weight: 700;">Ends soon</span>
+              </div>
+              <div style="height: 6px; background: #eee; border-radius: 3px; overflow: hidden;">
+                <div style="height: 100%; background: var(--amz-orange); width: ${claimedPct}%;"></div>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <button class="btn-add-cart" onclick="addToCartById(${p.id})">Add to Cart</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterDeals(cat) {
+      document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (cat === 'all') {
+        renderDeals(dealsData);
+      } else {
+        renderDeals(dealsData.filter(d => d.category === cat));
+      }
+    }
+  </script>
+</body>
+</html>
