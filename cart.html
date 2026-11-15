@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amazon Clone | Shopping Cart</title>
+  <link rel="stylesheet" href="static/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header>
+    <div class="navbar-top">
+      <a href="index.html" class="nav-logo">
+        <span class="brand-text">amazon<span class="brand-accent">.in</span></span>
+      </a>
+
+      <div class="nav-deliver" onclick="window.location.href='checkout.html'">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        <div>
+          <div class="nav-deliver-line1">Deliver to Bhuvan</div>
+          <div class="nav-deliver-line2">Hyderabad 500081</div>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <form class="nav-search-container" id="navSearchForm" onsubmit="handleNavSearch(event)">
+        <select class="search-select" id="searchCategorySelect">
+          <option value="All">All Departments</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Fashion">Fashion</option>
+          <option value="Home & Kitchen">Home & Kitchen</option>
+          <option value="Books">Books</option>
+        </select>
+        <div style="flex: 1; position: relative;">
+          <input type="text" class="search-input" id="navSearchInput" placeholder="Search Amazon products, brands, and deals..." autocomplete="off">
+          <div id="searchSuggestionsBox" class="suggestions-box"></div>
+        </div>
+        <button type="submit" class="search-btn" title="Search">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
+        </button>
+      </form>
+
+      <div class="nav-right">
+        <a href="login.html" class="nav-item">
+          <span class="nav-line1" id="navAccountName">Hello, sign in</span>
+          <span class="nav-line2">Account & Lists ▾</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+          <span class="nav-line1">Returns</span>
+          <span class="nav-line2">& Orders</span>
+        </a>
+        <a href="cart.html" class="nav-item nav-cart">
+          <div class="cart-icon-wrapper">
+            <span class="cart-count" id="navCartCount">0</span>
+            <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+          </div>
+          <span class="nav-line2" style="margin-top: 10px;">Cart</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Subnav -->
+    <div class="navbar-sub">
+      <a href="index.html" class="subnav-link">☰ All</a>
+      <a href="deals.html" class="subnav-link">🔥 Today's Deals</a>
+      <a href="index.html?category=Electronics" class="subnav-link">Electronics</a>
+      <a href="index.html?category=Fashion" class="subnav-link">Fashion & Clothing</a>
+      <a href="index.html?category=Home%20%26%20Kitchen" class="subnav-link">Home & Kitchen</a>
+      <a href="index.html?category=Books" class="subnav-link">Books & Study</a>
+      <a href="orders.html" class="subnav-link">📦 My Orders</a>
+      <a href="admin.html" class="subnav-link admin-link">⚙️ Seller / Admin Portal</a>
+    </div>
+  </header>
+
+  <!-- Main Cart Container -->
+  <main class="page-container" style="max-width: 1400px; margin: 20px auto; padding: 0 20px;">
+    <div style="display: grid; grid-template-columns: 2.8fr 1fr; gap: 24px; align-items: start;">
+      
+      <!-- Left: Cart Items List -->
+      <div style="background: #fff; padding: 24px; border-radius: 6px; border: 1px solid #e7e7e7;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #e7e7e7; padding-bottom: 12px; margin-bottom: 16px;">
+          <h1 style="font-size: 26px; font-weight: 700;">Shopping Cart</h1>
+          <span style="font-size: 14px; color: #565959;">Price</span>
+        </div>
+
+        <div id="cartFreeShippingBanner" style="background: #f0f8ff; border: 1px solid #d0e7ff; border-radius: 6px; padding: 12px 16px; margin-bottom: 20px; font-size: 14px;">
+          <div id="cartPageFreeShippingText">Add items to qualify for FREE Delivery</div>
+          <div class="cart-progress-bar" style="margin-top: 8px;">
+            <div class="cart-progress-fill" id="cartPageFreeShippingProgress" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <div id="cartPageItemsList"></div>
+
+        <div id="cartPageSubtotalRow" style="text-align: right; font-size: 18px; font-weight: 700; border-top: 1px solid #e7e7e7; padding-top: 16px; margin-top: 20px;">
+          Subtotal (<span id="cartTotalItemsCount">0</span> items): <span id="cartPageSubtotalAmount" style="color: var(--amz-red);">$0.00</span>
+        </div>
+      </div>
+
+      <!-- Right: Subtotal & Checkout Box -->
+      <div>
+        <div style="background: #fff; padding: 24px; border-radius: 6px; border: 1px solid #e7e7e7; margin-bottom: 20px;">
+          <div style="font-size: 18px; margin-bottom: 12px;">
+            Subtotal (<span id="sidebarTotalItems">0</span> items): <strong id="sidebarSubtotalAmount" style="color: var(--amz-red); font-size: 20px;">$0.00</strong>
+          </div>
+
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #333; margin-bottom: 16px; cursor: pointer;">
+            <input type="checkbox" id="giftCheck"> This order contains a gift
+          </label>
+
+          <!-- Coupon Input -->
+          <div style="background: #f7fafa; border: 1px solid #d5d9d9; border-radius: 6px; padding: 12px; margin-bottom: 16px;">
+            <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 6px;">Have a Promo Code?</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="couponCodeInput" class="form-control" placeholder="e.g. AMAZON20" style="text-transform: uppercase;">
+              <button onclick="applyCartCoupon()" class="btn-add-cart" style="padding: 6px 14px; font-size: 13px;">Apply</button>
+            </div>
+            <div id="couponStatusMessage" style="font-size: 12px; margin-top: 6px;"></div>
+            <div style="font-size: 11px; color: #666; margin-top: 6px;">
+              Try: <code style="color: var(--amz-orange); font-weight: 700;">AMAZON20</code> (20% off) or <code style="color: var(--amz-orange); font-weight: 700;">PRIME10</code> ($10 off)
+            </div>
+          </div>
+
+          <button onclick="window.location.href='checkout.html'" class="btn-checkout" style="width: 100%; padding: 12px; font-size: 15px;">
+            Proceed to Buy
+          </button>
+
+          <div style="margin-top: 16px; font-size: 12px; color: #565959; text-align: center;">
+            🔒 256-Bit SSL Encrypted Amazon Secure Checkout
+          </div>
+        </div>
+
+        <div style="background: #fff; padding: 20px; border-radius: 6px; border: 1px solid #e7e7e7;">
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Saved for Later</h3>
+          <div id="savedForLaterList" style="font-size: 13px; color: #666;">
+            No items saved for later yet.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Recommendations -->
+    <div style="background: #fff; padding: 24px; border-radius: 6px; border: 1px solid #e7e7e7; margin-top: 30px;">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">Recommended items based on your cart</h3>
+      <div id="cartRecommendationsGrid" class="products-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Back to top</div>
+    <div class="footer-bottom">
+      <p>Final Year Academic Project: Amazon Clone Full-Stack E-Commerce Web Application</p>
+      <p>Developed with ❤️ by <strong>Bhuvan Kolisetti</strong> | <a href="https://github.com/bhuvankolisetti/e-commerce" style="color: var(--amz-yellow);" target="_blank">GitHub Repository</a></p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="static/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCartPage();
+      loadCartRecommendations();
+    });
+
+    let appliedDiscount = 0;
+    let appliedCouponCode = '';
+
+    function renderCartPage() {
+      const container = document.getElementById('cartPageItemsList');
+      const countEl = document.getElementById('cartTotalItemsCount');
+      const sidebarCount = document.getElementById('sidebarTotalItems');
+      const subtotalEl = document.getElementById('cartPageSubtotalAmount');
+      const sidebarSubtotal = document.getElementById('sidebarSubtotalAmount');
+      const freeShippingText = document.getElementById('cartPageFreeShippingText');
+      const freeShippingBar = document.getElementById('cartPageFreeShippingProgress');
+
+      const totalCount = state.cart.reduce((sum, it) => sum + it.quantity, 0);
+      const rawSubtotal = state.cart.reduce((sum, it) => sum + (it.price * it.quantity), 0);
+      const finalSubtotal = Math.max(0, rawSubtotal - appliedDiscount);
+
+      if (countEl) countEl.textContent = totalCount;
+      if (sidebarCount) sidebarCount.textContent = totalCount;
+      if (subtotalEl) subtotalEl.textContent = `$${finalSubtotal.toFixed(2)}`;
+      if (sidebarSubtotal) sidebarSubtotal.textContent = `$${finalSubtotal.toFixed(2)}`;
+
+      if (rawSubtotal >= 35.0) {
+        if (freeShippingText) freeShippingText.innerHTML = '🎉 <strong>Your order qualifies for FREE Delivery!</strong> Choose this option at checkout.';
+        if (freeShippingBar) freeShippingBar.style.width = '100%';
+      } else {
+        const diff = (35.0 - rawSubtotal).toFixed(2);
+        if (freeShippingText) freeShippingText.innerHTML = `Add <strong>$${diff}</strong> more of eligible items to your order for <strong>FREE Delivery</strong>.`;
+        if (freeShippingBar) freeShippingBar.style.width = `${Math.min(100, (rawSubtotal / 35.0) * 100)}%`;
+      }
+
+      if (state.cart.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 60px 20px;">
+            <h2 style="font-size: 22px; margin-bottom: 8px;">Your Amazon Cart is empty</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Your shopping cart is waiting. Give it purpose — explore today's deals and bestsellers.</p>
+            <a href="index.html" class="btn-add-cart" style="display: inline-block; padding: 10px 24px; text-decoration: none; font-size: 14px;">Continue Shopping</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = state.cart.map(item => `
+        <div style="display: flex; gap: 20px; padding: 20px 0; border-bottom: 1px solid #e7e7e7;">
+          <a href="product.html?id=${item.id}" style="width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; background: #fff;">
+            <img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.title)}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+          </a>
+          <div style="flex: 1;">
+            <a href="product.html?id=${item.id}" style="font-size: 17px; font-weight: 600; color: #0f1111; text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3;">
+              ${escapeHtml(item.title)}
+            </a>
+            <div style="color: var(--amz-green); font-size: 12px; font-weight: 700; margin: 4px 0;">In Stock</div>
+            <div style="font-size: 12px; color: #565959; margin-bottom: 10px;">Eligible for FREE Shipping & Free Returns</div>
+            
+            <div style="display: flex; align-items: center; gap: 14px; font-size: 13px;">
+              <div style="display: flex; align-items: center; gap: 6px; background: #f0f2f2; border: 1px solid #d5d9d9; border-radius: 6px; padding: 2px 8px;">
+                <button onclick="updateCartQty(${item.id}, -1); renderCartPage();" style="border: none; background: none; font-weight: 700; cursor: pointer; font-size: 14px;">-</button>
+                <span style="font-weight: 700; min-width: 24px; text-align: center;">${item.quantity}</span>
+                <button onclick="updateCartQty(${item.id}, 1); renderCartPage();" style="border: none; background: none; font-weight: 700; cursor: pointer; font-size: 14px;">+</button>
+              </div>
+              <span style="color: #ccc;">|</span>
+              <a href="#" onclick="removeCartItem(${item.id}); renderCartPage(); return false;" style="color: var(--amz-link); text-decoration: none;">Delete</a>
+              <span style="color: #ccc;">|</span>
+              <a href="product.html?id=${item.id}" style="color: var(--amz-link); text-decoration: none;">View details</a>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <span style="font-size: 18px; font-weight: 700; color: #0f1111;">$${(item.price * item.quantity).toFixed(2)}</span>
+            <div style="font-size: 12px; color: #565959;">$${item.price.toFixed(2)} each</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function applyCartCoupon() {
+      const code = document.getElementById('couponCodeInput').value.trim().toUpperCase();
+      const statusEl = document.getElementById('couponStatusMessage');
+      const subtotal = state.cart.reduce((sum, it) => sum + (it.price * it.quantity), 0);
+
+      if (!code) {
+        statusEl.innerHTML = '<span style="color: red;">Please enter a promo code</span>';
+        return;
+      }
+
+      // Check coupon (works on both local server and static GitHub Pages)
+      if (STATIC_COUPONS[code]) {
+        const c = STATIC_COUPONS[code];
+        if (subtotal < c.min) {
+          statusEl.innerHTML = `<span style="color: red;">Coupon requires minimum order of $${c.min}</span>`;
+          return;
+        }
+        appliedDiscount = c.percent ? (subtotal * c.percent / 100) : c.flat;
+        appliedCouponCode = code;
+        localStorage.setItem('amz_coupon', JSON.stringify({ code: code, discount: appliedDiscount }));
+        statusEl.innerHTML = `<span style="color: var(--amz-green); font-weight: 700;">✓ Coupon ${code} applied! Saved $${appliedDiscount.toFixed(2)}</span>`;
+        renderCartPage();
+        showToast(`Coupon ${code} applied!`, 'success');
+      } else {
+        statusEl.innerHTML = '<span style="color: red;">Invalid promo code</span>';
+      }
+    }
+
+    function loadCartRecommendations() {
+      const recs = STATIC_CATALOG.slice(0, 4);
+      document.getElementById('cartRecommendationsGrid').innerHTML = recs.map(p => `
+        <div class="product-card">
+          <a href="product.html?id=${p.id}" style="text-decoration: none; color: inherit;">
+            <div class="product-img-box">
+              <img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.title)}">
+            </div>
+            <h4 class="product-title" style="font-size: 13px;">${escapeHtml(p.title)}</h4>
+            <div class="price-row">
+              <span class="price-whole" style="font-size: 18px;">$${p.price.toFixed(2)}</span>
+            </div>
+          </a>
+          <button class="btn-add-cart" style="margin-top: 8px;" onclick="addToCartById(${p.id}); renderCartPage();">Add to Cart</button>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
