@@ -5,44 +5,61 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-bhuvankolisetti%2Fe--commerce-orange.svg)](https://github.com/bhuvankolisetti/e-commerce)
 
-A production-grade, responsive, full-featured **Amazon Clone E-Commerce Web Application** developed as a **Final Year Capstone Project**. Built with an ultra-lightweight, zero-dependency Python backend, SQLite relational database, and modern interactive responsive frontend.
+A production-grade, responsive, full-featured **Amazon Clone E-Commerce Web Application** developed as an engineering **Final Year Capstone Project**. Built with a zero-dependency Python backend, SQLite relational database, and modern responsive frontend.
 
 ---
 
-## 🌟 Key Features
+## 🌟 Key Pages & Functional Modules
 
-### 1. 🛍️ Customer Storefront & Navigation
-- **Authentic Amazon Navbar**: Logo branding, delivery address selector, department search dropdown, user greeting, returns & orders, and real-time cart badge.
-- **Dynamic Hero Banner**: Auto-advancing promotional carousel with category call-to-actions.
-- **Amazon 4-Card Category Grids**: High-impact promotional cards for Electronics, Fashion, Home & Kitchen, and Books.
-- **Advanced Catalog Search & Filters**: Instant multi-category filtering, live search queries, and dynamic sorting (Price low/high, Highest rated, Biggest discounts).
+### 1. 🛍️ Storefront & Dynamic Navigation (`/`)
+- **Authentic Amazon Navbar**: Logo branding, deliver-to location indicator (`Deliver to Bhuvan, Hyderabad`), department selector dropdown, and real-time cart badge.
+- **Instant Search Autocomplete**: As-you-type live suggestions dropdown showing matching products, thumbnail previews, and instant price lookups.
+- **Department & Price Range Filtering**: Filter by category (Electronics, Fashion, Home & Kitchen, Books) or enter custom Min/Max price boundaries.
+- **Hero Promotional Banner Carousel**: Auto-advancing slider with high-resolution slides for Prime Day Deals, Fashion, and Smart Home Upgrades.
+- **4-Card Category Grids**: Amazon-style teaser cards for fast departmental exploration.
+- **Catalog of 26 High-Res Products**: Realistic product listings with star ratings, review counts, deal tags, Prime badges, and discount calculations.
 
-### 2. 🔍 Product Details & Customer Reviews
-- **High-Resolution Showcase**: Rich product photography with in-stock indicators and Prime delivery badges.
-- **Full Specifications**: Detailed feature bullet points and savings calculation (`-$XX.XX (Save XX%)`).
-- **Review System**: Real-time customer feedback submission with 5-star ratings and verified purchase timestamps.
+### 2. 🔍 Dedicated Product Details Page (`/product?id=...`)
+- **Gallery & Visual Showcase**: High-resolution image preview with thumbnail switcher.
+- **Full Specifications & Bullet Points**: In-depth feature list, warranty details, and description.
+- **Interactive Rating Breakdown**: 5-star distribution percentage bars.
+- **Customer Reviews & Testimonials**: List of verified customer reviews with star ratings and a live submission form to post new reviews.
+- **Related Products Carousel**: "Customers who viewed this item also bought" recommendation grid.
+- **Quantity Selector, Add to Cart & Buy Now**: Direct integration with cart and checkout.
 
-### 3. 🛒 Interactive Shopping Cart & Free Shipping
-- **Slide-out Cart Drawer**: Smooth slide-over drawer with instant quantity increments, decrements, and deletions.
-- **Free Delivery Progress Indicator**: Visual progress bar tracking eligible free shipping over $35.00 threshold.
-- **Persistent Cart**: Automatically saved across browser sessions using `localStorage`.
+### 3. 🛒 Dedicated Shopping Cart Page (`/cart`)
+- **Full-Width Item Management**: Product thumbnail, title, price, quantity increment/decrement, and deletion.
+- **Save for Later**: Move items to wishlist with 1-click.
+- **Promotional Coupon Code Engine**: Apply promo codes (`AMAZON20` for 20% off, `PRIME10` for $10 off, `WELCOME50` for $50 off).
+- **Free Delivery Progress Indicator**: Visual bar tracking progress toward the $35.00 free shipping threshold.
+- **Gift Option**: "This order contains a gift" checkbox.
 
-### 4. 💳 Multi-Step Checkout & Simulated Payment
-- **Step 1: Shipping Address**: Form with validation for recipient, street address, city, and postal code.
-- **Step 2: Payment Gateways**: Simulated 1-Click Amazon Pay Balance, Credit/Debit Card, UPI / QR Code, and Cash on Delivery.
-- **Step 3: Review & Place Order**: Automated calculation of subtotal, 8% sales tax, shipping fee, and grand total.
+### 4. 💳 Dedicated Multi-Step Checkout Page (`/checkout`)
+- **Step 1 - Shipping Address**: Recipient name, mobile, email, street address, city, state, and postal code.
+- **Step 2 - Payment Gateway Selection**:
+  - ⚡ *Amazon Pay Balance (1-Click Instant Checkout)*
+  - 💳 *Credit or Debit Card (Visa, MasterCard, RuPay)*
+  - 📱 *UPI / QR Code (Google Pay, PhonePe, Paytm)*
+  - 💵 *Cash on Delivery (COD)*
+- **Step 3 - Review Items & Place Order**: Automated computation of subtotal, coupon savings, 8% sales tax, shipping fee, and grand total.
 
-### 5. 🧾 Order Confirmation & Print Invoice
+### 5. 🧾 Order Confirmation & Package Tracking (`/orders`)
 - **Order Generation**: Unique order identifier (`AMZ-YYYYMMDD...`).
-- **Package Tracking**: Order status tracking (`Processing`, `Shipped`, `Delivered`).
-- **Printable Receipt**: Instant 1-click printable order invoice.
+- **Visual Delivery Timeline**: Interactive progress bar (`Ordered` ➔ `Shipped` ➔ `Delivered`).
+- **Printable Invoices**: 1-click browser-native printable receipt.
+- **Search Past Orders**: Filter orders by keyword or order ID.
 
-### 6. ⚙️ Seller Central & Admin Portal
-- **Business KPI Metrics**: Live dashboard displaying Total Revenue, Total Orders, Active Catalog Items, and Registered Users.
-- **Catalog Management (CRUD)**: Create new products with custom deal prices, badges, categories, and image URLs; edit or delete items in real-time.
-- **Order Fulfillment**: Track placed orders and update customer fulfillment statuses live.
+### 6. 🔥 Today's Deals Page (`/deals`)
+- **Live Countdown Timer**: "Deals end in: 06h : 42m : 18s" timer.
+- **Lightning Deals**: Dynamic % claimed progress indicators.
+- **Department Filters**: One-click filters for Electronics, Fashion, Home, and Books.
 
-### 7. 🔐 User Authentication
+### 7. ⚙️ Seller Central & Admin Portal (`/admin`)
+- **Business KPI Metrics**: Live dashboard displaying Total Revenue, Total Orders, Active Catalog Items, and Registered Customers.
+- **Catalog Management (CRUD)**: Create new products with custom deal prices, badges, categories, and image URLs with live image preview; edit or delete items in real-time.
+- **Customer Order Fulfillment**: Track placed orders and update fulfillment statuses (`Processing` ➔ `Shipped` ➔ `Delivered`).
+
+### 8. 🔐 Authentication & Accounts (`/login`)
 - **Secure Authentication**: Customer and Admin login/registration with SHA-256 password hashing.
 - **Pre-configured Demo Credentials**:
   - **Admin Manager**: `admin@amazon.com` / `admin123`
@@ -54,12 +71,14 @@ A production-grade, responsive, full-featured **Amazon Clone E-Commerce Web Appl
 
 ```text
 c:\e commerce\
-├── app.py                     # Main application server (REST API + static file server, 0 dependencies)
-├── database.py                # Database models, SQLite setup & sample product seeding
+├── app.py                     # Main application server & REST APIs (ThreadingHTTPServer)
+├── database.py                # Database models, SQLite setup & 26 product seed items
+├── ecommerce.db               # SQLite database with 7 relational tables
 ├── schema.sql                 # SQL schema DDL for documentation & viva
 ├── requirements.txt           # Dependencies specification
-├── push_to_github.ps1         # One-click PowerShell script to push to GitHub
-├── push_to_github.bat         # One-click Windows batch script to push to GitHub
+├── run_website.bat            # 1-Click launcher (starts server + opens browser to localhost:5000)
+├── push_to_github.bat         # 1-Click Windows batch script to push to GitHub
+├── push_to_github.ps1         # 1-Click PowerShell script to push to GitHub
 ├── github_sync.py             # Python sync utility (Git CLI & GitHub REST API support)
 ├── test_app.py                # Automated unit & integration test suite (6 passing tests)
 ├── TEST_CASES.md              # Test specifications & system test cases for viva
@@ -71,9 +90,16 @@ c:\e commerce\
 │   ├── css/
 │   │   └── style.css          # Authentic Amazon design system (CSS variables, responsive grid)
 │   └── js/
-│       └── app.js             # Main SPA controller (state, catalog, cart, checkout, admin)
+│       └── app.js             # Global state controller, live search, cart & auth
 └── templates/
-    └── index.html             # Single-Page Application Amazon clone storefront
+    ├── index.html             # Homepage catalog & hero banner
+    ├── product.html           # Dedicated product details & reviews page
+    ├── cart.html              # Dedicated shopping cart page with coupon engine
+    ├── checkout.html          # Dedicated multi-step checkout page
+    ├── orders.html            # Dedicated order history & tracking page
+    ├── deals.html             # Dedicated Today's Deals & lightning deals page
+    ├── admin.html             # Dedicated Amazon Seller Central & Admin Portal
+    └── login.html             # Dedicated Amazon Sign In & Account Registration page
 ```
 
 ---
@@ -90,43 +116,12 @@ cd "c:\e commerce"
 # Start the application server
 python app.py
 ```
+*(Or simply double-click [`run_website.bat`](run_website.bat))*.
 
 ### Step 2: Open in Your Browser
-Open your browser and navigate to:
+Visit:
 ```text
 http://localhost:5000
-```
-
----
-
-## 🔄 How to Push Updates to GitHub
-
-To push all files to your GitHub repository ([`bhuvankolisetti/e-commerce`](https://github.com/bhuvankolisetti/e-commerce)):
-
-### Option A: One-Click Windows Script (Easiest)
-Simply double-click:
-```text
-push_to_github.bat
-```
-or run in PowerShell:
-```powershell
-.\push_to_github.ps1
-```
-
-### Option B: Using Git CLI Directly
-```bash
-git init
-git branch -M main
-git remote add origin https://github.com/bhuvankolisetti/e-commerce.git
-git add .
-git commit -m "Amazon Clone Final Year Project update"
-git push -u origin main
-```
-
-### Option C: Using the Python Sync Tool with a GitHub Token
-If Git CLI is not installed on your system, you can upload directly using a GitHub Personal Access Token:
-```bash
-python github_sync.py --token YOUR_GITHUB_PERSONAL_ACCESS_TOKEN
 ```
 
 ---
@@ -135,18 +130,19 @@ python github_sync.py --token YOUR_GITHUB_PERSONAL_ACCESS_TOKEN
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/products` | Retrieve all products (supports `?category=`, `?search=`, `?sort=`) |
-| `GET` | `/api/products/<id>` | Retrieve single product details, reviews, and related products |
-| `POST` | `/api/products` | Add a new product (Admin) |
-| `PUT` | `/api/admin/products/<id>` | Update an existing product (Admin) |
-| `DELETE` | `/api/admin/products/<id>` | Delete a product from inventory (Admin) |
-| `POST` | `/api/orders` | Submit a new order |
+| `GET` | `/api/products` | Retrieve all products (supports `?category=`, `?search=`, `?sort=`, `?min_price=`, `?max_price=`) |
+| `GET` | `/api/products/<id>` | Retrieve single product details, reviews, rating breakdown, and related items |
+| `GET` | `/api/search/suggestions` | Instant live search auto-complete endpoint (`?q=...`) |
+| `GET` | `/api/deals` | Retrieve products with Deal of the Day and >20% discounts |
+| `POST` | `/api/coupon/validate` | Validate coupon code (`AMAZON20`, `PRIME10`, `WELCOME50`) |
+| `POST` | `/api/orders` | Submit a new order with discount support |
 | `GET` | `/api/orders` | Retrieve order list (supports `?user_id=`) |
 | `PATCH` | `/api/orders/<id>/status` | Update fulfillment status (Admin) |
 | `POST` | `/api/auth/login` | User login verification |
 | `POST` | `/api/auth/register` | Create a new customer account |
 | `POST` | `/api/reviews` | Submit product review and rating |
 | `GET` | `/api/admin/stats` | Retrieve platform revenue and performance metrics |
+| `POST` | `/api/wishlist` | Toggle item in wishlist |
 
 ---
 
@@ -155,4 +151,3 @@ python github_sync.py --token YOUR_GITHUB_PERSONAL_ACCESS_TOKEN
 - **Target Repository**: [https://github.com/bhuvankolisetti/e-commerce](https://github.com/bhuvankolisetti/e-commerce)
 - **Course**: Final Year Capstone Project (B.Tech / B.E. / BCA / MCA)
 - **Year**: 2026
-
