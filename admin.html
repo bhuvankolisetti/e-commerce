@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amazon Clone | Seller Central & Admin Portal</title>
+  <link rel="stylesheet" href="static/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+</head>
+<body style="background: #f3f3f3;">
+
+  <!-- Admin Header -->
+  <header style="background: #131921; color: #fff; padding: 12px 24px; border-bottom: 3px solid var(--amz-orange);">
+    <div style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <a href="index.html" class="nav-logo">
+          <span class="brand-text">amazon<span class="brand-accent">.in</span></span>
+        </a>
+        <span style="background: var(--amz-orange); color: #131921; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">
+          Seller Central & Admin
+        </span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 20px; font-size: 14px;">
+        <span>Logged in as: <strong>Admin Manager</strong></span>
+        <a href="index.html" style="color: #fff; text-decoration: none;">View Storefront ➔</a>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width: 1400px; margin: 24px auto; padding: 0 20px;">
+    <!-- KPI Analytics Cards -->
+    <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 24px;">
+      <div class="stat-card" style="border-top: 4px solid var(--amz-orange);">
+        <div class="stat-val" id="statRevenue">$4,850.00</div>
+        <div class="stat-label">Total Platform Revenue</div>
+      </div>
+      <div class="stat-card" style="border-top: 4px solid var(--amz-green);">
+        <div class="stat-val" id="statOrders">8</div>
+        <div class="stat-label">Orders Received</div>
+      </div>
+      <div class="stat-card" style="border-top: 4px solid var(--amz-link);">
+        <div class="stat-val" id="statProducts">26</div>
+        <div class="stat-label">Active Products in Catalog</div>
+      </div>
+      <div class="stat-card" style="border-top: 4px solid #8e44ad;">
+        <div class="stat-val" id="statUsers">42</div>
+        <div class="stat-label">Registered Customers</div>
+      </div>
+    </div>
+
+    <!-- Main Grid: Product Creation & Inventory -->
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; align-items: start; margin-bottom: 30px;">
+      
+      <!-- Add Product Form -->
+      <div style="background: #fff; border: 1px solid #d5d9d9; border-radius: 8px; padding: 20px;">
+        <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 14px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+          ➕ Add New Product to Store
+        </h3>
+
+        <form id="adminAddForm" onsubmit="handleAdminCreateProduct(event)">
+          <div class="form-group">
+            <label class="form-label">Product Title</label>
+            <input type="text" id="pTitle" class="form-control" placeholder="e.g. Wireless Ergonomic Mouse" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select id="pCategory" class="form-control">
+                <option value="Electronics">Electronics</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Home & Kitchen">Home & Kitchen</option>
+                <option value="Books">Books</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Badge Tag</label>
+              <input type="text" id="pBadge" class="form-control" placeholder="Best Seller">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Deal Price ($)</label>
+              <input type="number" step="0.01" id="pPrice" class="form-control" placeholder="49.99" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">List Price ($)</label>
+              <input type="number" step="0.01" id="pOrigPrice" class="form-control" placeholder="69.99">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Image URL</label>
+            <input type="url" id="pImage" class="form-control" placeholder="https://images.unsplash.com/..." required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description & Highlights</label>
+            <textarea id="pDesc" class="form-control" rows="3" placeholder="Provide full features and product description..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn-checkout" style="width: 100%; padding: 10px;">
+            Save & Publish to Amazon Catalog
+          </button>
+        </form>
+      </div>
+
+      <!-- Inventory Table -->
+      <div style="background: #fff; border: 1px solid #d5d9d9; border-radius: 8px; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+          <h3 style="font-size: 17px; font-weight: 700;">Live Inventory Management</h3>
+          <span id="inventoryCountBadge" style="font-size: 13px; color: #565959;">26 Products</span>
+        </div>
+
+        <div style="max-height: 480px; overflow-y: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminInventoryTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Orders Fulfillment Section -->
+    <div style="background: #fff; border: 1px solid #d5d9d9; border-radius: 8px; padding: 20px;">
+      <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 14px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+        📦 Customer Orders & Fulfillment Management
+      </h3>
+
+      <div style="max-height: 380px; overflow-y: auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer Name</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="adminOrdersTable">
+            <tr>
+              <td style="font-family: monospace; font-weight: 700;">AMZ-20261115-9428</td>
+              <td>Bhuvan Kolisetti</td>
+              <td style="font-weight: 700; color: var(--amz-red);">$348.00</td>
+              <td><span style="color: var(--amz-green); font-weight: 700;">● Delivered</span></td>
+              <td>11/15/2026</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="static/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAdminInventory();
+    });
+
+    function renderAdminInventory() {
+      document.getElementById('adminInventoryTable').innerHTML = STATIC_CATALOG.map(p => `
+        <tr>
+          <td><img src="${escapeHtml(p.image_url)}" style="width: 38px; height: 38px; object-fit: contain;"></td>
+          <td style="font-weight: 600; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            <a href="product.html?id=${p.id}" style="color: inherit; text-decoration: none;">${escapeHtml(p.title)}</a>
+          </td>
+          <td>${escapeHtml(p.category)}</td>
+          <td><strong>$${p.price.toFixed(2)}</strong></td>
+          <td>
+            <button onclick="adminDeleteProduct(${p.id})" style="background: #b12704; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+              Delete
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function handleAdminCreateProduct(e) {
+      e.preventDefault();
+      const title = document.getElementById('pTitle').value.trim();
+      const category = document.getElementById('pCategory').value;
+      const price = parseFloat(document.getElementById('pPrice').value);
+      const original_price = parseFloat(document.getElementById('pOrigPrice').value || price);
+      const image_url = document.getElementById('pImage').value.trim();
+      const description = document.getElementById('pDesc').value.trim();
+      const badge = document.getElementById('pBadge').value.trim();
+
+      STATIC_CATALOG.unshift({
+        id: Date.now(),
+        title, category, price, original_price,
+        discount_pct: Math.round((1 - price/original_price) * 100),
+        rating: 5.0, rating_count: 1,
+        image_url, description,
+        features: ["High quality product with genuine warranty"],
+        in_stock: 1, prime_eligible: 1, badge
+      });
+
+      renderAdminInventory();
+      document.getElementById('adminAddForm').reset();
+      showToast('Product added to Amazon catalog!', 'success');
+    }
+
+    function adminDeleteProduct(id) {
+      if (!confirm('Delete this product from catalog?')) return;
+      const idx = STATIC_CATALOG.findIndex(p => p.id === id);
+      if (idx !== -1) STATIC_CATALOG.splice(idx, 1);
+      renderAdminInventory();
+      showToast('Product removed from catalog', 'info');
+    }
+  </script>
+</body>
+</html>
