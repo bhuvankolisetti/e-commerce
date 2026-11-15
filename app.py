@@ -1,7 +1,7 @@
 """
 Amazon Clone E-Commerce Application Backend
+Full-Featured Multi-Page & REST API Platform
 Built with Python standard library (zero external dependencies)
-Provides high-performance REST APIs and serves responsive frontend views.
 Author: Bhuvan Kolisetti
 Repository: https://github.com/bhuvankolisetti/e-commerce
 """
@@ -15,7 +15,6 @@ import urllib.parse
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from datetime import datetime
 
-# Import database module
 from database import get_db, init_db, hash_password
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -50,23 +49,51 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
     def _send_error_json(self, message, status=400):
         self._send_json({'error': message, 'success': False}, status)
 
+    def _serve_template(self, filename):
+        file_path = os.path.join(TEMPLATES_DIR, filename)
+        if os.path.exists(file_path):
+            self._set_headers(200, 'text/html; charset=utf-8')
+            with open(file_path, 'rb') as f:
+                self.wfile.write(f.read())
+        else:
+            self.send_error(404, f"Template {filename} not found")
+
     def do_GET(self):
         parsed_url = urllib.parse.urlparse(self.path)
         path = parsed_url.path
         query = urllib.parse.parse_qs(parsed_url.query)
 
-        # 1. Root & HTML Views
-        if path == '/' or path == '/index.html':
-            index_path = os.path.join(TEMPLATES_DIR, 'index.html')
-            if os.path.exists(index_path):
-                self._set_headers(200, 'text/html; charset=utf-8')
-                with open(index_path, 'rb') as f:
-                    self.wfile.write(f.read())
-            else:
-                self.send_error(404, "index.html template not found")
+        # ---------------------------------------------------------
+        # 1. HTML PAGE ROUTES
+        # ---------------------------------------------------------
+        if path in ['/', '/index', '/index.html']:
+            self._serve_template('index.html')
+            return
+        elif path in ['/cart', '/cart.html']:
+            self._serve_template('cart.html')
+            return
+        elif path in ['/checkout', '/checkout.html']:
+            self._serve_template('checkout.html')
+            return
+        elif path in ['/orders', '/orders.html']:
+            self._serve_template('orders.html')
+            return
+        elif path in ['/deals', '/deals.html']:
+            self._serve_template('deals.html')
+            return
+        elif path in ['/admin', '/admin.html']:
+            self._serve_template('admin.html')
+            return
+        elif path in ['/login', '/login.html']:
+            self._serve_template('login.html')
+            return
+        elif path in ['/product', '/product.html'] or path.startswith('/product/'):
+            self._serve_template('product.html')
             return
 
-        # 2. Static Assets (/static/...)
+        # ---------------------------------------------------------
+        # 2. STATIC ASSETS (/static/...)
+        # ---------------------------------------------------------
         if path.startswith('/static/'):
             relative_path = path[len('/static/'):].replace('/', os.sep)
             file_path = os.path.join(STATIC_DIR, relative_path)
@@ -80,11 +107,33 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
                 self.send_error(404, f"File {path} not found")
                 return
 
-        # 3. REST API - Products List
+        # ---------------------------------------------------------
+        # 3. REST API: Search Suggestions (Autocomplete)
+        # ---------------------------------------------------------
+        if path == '/api/search/suggestions':
+            q = query.get('q', [''])[0].strip().lower()
+            if not q:
+                self._send_json({'suggestions': []})
+                return
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, title, category, price, image_url FROM products WHERE LOWER(title) LIKE ? LIMIT 6", (f"%{q}%",))
+            results = [dict(r) for r in cursor.fetchall()]
+            conn.close()
+            self._send_json({'suggestions': results})
+            return
+
+        # ---------------------------------------------------------
+        # 4. REST API: Products Catalog
+        # ---------------------------------------------------------
         if path == '/api/products':
             category = query.get('category', [None])[0]
             search = query.get('search', [None])[0]
             sort_by = query.get('sort', ['featured'])[0]
+            deals_only = query.get('deals', [None])[0]
+            min_price = query.get('min_price', [None])[0]
+            max_price = query.get('max_price', [None])[0]
+            min_rating = query.get('min_rating', [None])[0]
 
             conn = get_db()
             cursor = conn.cursor()
@@ -100,6 +149,21 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
                 sql += " AND (LOWER(title) LIKE LOWER(?) OR LOWER(description) LIKE LOWER(?))"
                 search_term = f"%{search}%"
                 params.extend([search_term, search_term])
+
+            if deals_only == '1':
+                sql += " AND (deal_of_day = 1 OR discount_pct >= 20)"
+
+            if min_price and min_price.replace('.', '', 1).isdigit():
+                sql += " AND price >= ?"
+                params.append(float(min_price))
+
+            if max_price and max_price.replace('.', '', 1).isdigit():
+                sql += " AND price <= ?"
+                params.append(float(max_price))
+
+            if min_rating and min_rating.replace('.', '', 1).isdigit():
+                sql += " AND rating >= ?"
+                params.append(float(min_rating))
 
             if sort_by == 'price_low':
                 sql += " ORDER BY price ASC"
@@ -129,7 +193,9 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
             self._send_json({'success': True, 'count': len(products), 'products': products})
             return
 
-        # 4. REST API - Single Product Details
+        # ---------------------------------------------------------
+        # 5. REST API: Single Product Details
+        # ---------------------------------------------------------
         if path.startswith('/api/products/'):
             product_id = path.split('/')[-1]
             if product_id.isdigit():
@@ -154,16 +220,48 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
                 cursor.execute("SELECT * FROM reviews WHERE product_id = ? ORDER BY created_at DESC", (int(product_id),))
                 reviews = [dict(r) for r in cursor.fetchall()]
 
-                # Fetch related products
-                cursor.execute("SELECT id, title, price, original_price, image_url, rating FROM products WHERE category = ? AND id != ? LIMIT 4", 
+                # Calculate star rating breakdown percentages
+                rating_counts = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
+                total_rev = len(reviews)
+                for r in reviews:
+                    star = int(round(r['rating']))
+                    if star in rating_counts:
+                        rating_counts[star] += 1
+
+                rating_breakdown = {}
+                for star in range(5, 0, -1):
+                    rating_breakdown[star] = round((rating_counts[star] / total_rev * 100)) if total_rev > 0 else (75 if star == 5 else 15 if star == 4 else 5)
+
+                # Fetch related products in the same category
+                cursor.execute("SELECT id, title, price, original_price, image_url, rating, rating_count, badge FROM products WHERE category = ? AND id != ? LIMIT 4", 
                                (p['category'], int(product_id)))
                 related = [dict(r) for r in cursor.fetchall()]
 
                 conn.close()
-                self._send_json({'success': True, 'product': p, 'reviews': reviews, 'related': related})
+                self._send_json({
+                    'success': True, 
+                    'product': p, 
+                    'reviews': reviews, 
+                    'related': related,
+                    'rating_breakdown': rating_breakdown
+                })
                 return
 
-        # 5. REST API - Get Orders
+        # ---------------------------------------------------------
+        # 6. REST API: Today's Deals
+        # ---------------------------------------------------------
+        if path == '/api/deals':
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM products WHERE deal_of_day = 1 OR discount_pct >= 20 ORDER BY discount_pct DESC")
+            deals = [dict(r) for r in cursor.fetchall()]
+            conn.close()
+            self._send_json({'success': True, 'count': len(deals), 'deals': deals})
+            return
+
+        # ---------------------------------------------------------
+        # 7. REST API: Orders List
+        # ---------------------------------------------------------
         if path == '/api/orders':
             user_id = query.get('user_id', [None])[0]
             conn = get_db()
@@ -175,8 +273,6 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
                 cursor.execute("SELECT * FROM orders ORDER BY created_at DESC")
 
             orders = [dict(o) for o in cursor.fetchall()]
-
-            # Attach items for each order
             for o in orders:
                 cursor.execute("SELECT * FROM order_items WHERE order_id = ?", (o['id'],))
                 o['items'] = [dict(it) for it in cursor.fetchall()]
@@ -185,17 +281,38 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
             self._send_json({'success': True, 'orders': orders})
             return
 
-        # 6. REST API - Categories list
+        # ---------------------------------------------------------
+        # 8. REST API: Wishlist
+        # ---------------------------------------------------------
+        if path == '/api/wishlist':
+            user_id = query.get('user_id', [1])[0]
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute("""
+            SELECT p.*, w.id as wishlist_id FROM wishlist w 
+            JOIN products p ON w.product_id = p.id 
+            WHERE w.user_id = ? ORDER BY w.created_at DESC
+            """, (int(user_id) if str(user_id).isdigit() else 1,))
+            items = [dict(r) for r in cursor.fetchall()]
+            conn.close()
+            self._send_json({'success': True, 'items': items})
+            return
+
+        # ---------------------------------------------------------
+        # 9. REST API: Categories
+        # ---------------------------------------------------------
         if path == '/api/categories':
             conn = get_db()
             cursor = conn.cursor()
-            cursor.execute("SELECT DISTINCT category, COUNT(*) as count FROM products GROUP BY category")
+            cursor.execute("SELECT category, COUNT(*) as count, MIN(image_url) as sample_img FROM products GROUP BY category")
             categories = [dict(c) for c in cursor.fetchall()]
             conn.close()
             self._send_json({'success': True, 'categories': categories})
             return
 
-        # 7. REST API - Admin Stats
+        # ---------------------------------------------------------
+        # 10. REST API: Admin Stats
+        # ---------------------------------------------------------
         if path == '/api/admin/stats':
             conn = get_db()
             cursor = conn.cursor()
@@ -215,6 +332,10 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
             cursor.execute("SELECT status, COUNT(*) as count FROM orders GROUP BY status")
             order_statuses = [dict(s) for s in cursor.fetchall()]
 
+            # Recent 5 orders
+            cursor.execute("SELECT id, order_number, customer_name, total_amount, status, created_at FROM orders ORDER BY created_at DESC LIMIT 5")
+            recent_orders = [dict(r) for r in cursor.fetchall()]
+
             conn.close()
             self._send_json({
                 'success': True,
@@ -224,7 +345,8 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
                     'total_products': total_products,
                     'total_users': total_users,
                     'category_counts': category_counts,
-                    'order_statuses': order_statuses
+                    'order_statuses': order_statuses,
+                    'recent_orders': recent_orders
                 }
             })
             return
@@ -290,7 +412,41 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
                 self._send_error_json("Invalid email or password", 401)
             return
 
-        # 3. Create Order
+        # 3. Validate Coupon
+        if path == '/api/coupon/validate':
+            code = body.get('code', '').strip().upper()
+            subtotal = float(body.get('subtotal', 0))
+
+            conn = get_db()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM coupons WHERE code = ? AND active = 1", (code,))
+            coupon = cursor.fetchone()
+            conn.close()
+
+            if not coupon:
+                self._send_error_json("Invalid or expired coupon code", 404)
+                return
+
+            c = dict(coupon)
+            if subtotal < c['min_amount']:
+                self._send_error_json(f"Coupon requires a minimum order of ${c['min_amount']:.2f}", 400)
+                return
+
+            discount = 0.0
+            if c['discount_percent'] > 0:
+                discount = round((subtotal * c['discount_percent']) / 100.0, 2)
+            elif c['discount_flat'] > 0:
+                discount = min(subtotal, c['discount_flat'])
+
+            self._send_json({
+                'success': True,
+                'code': c['code'],
+                'discount': discount,
+                'message': f"Coupon {c['code']} applied successfully! You saved ${discount:.2f}."
+            })
+            return
+
+        # 4. Create Order
         if path == '/api/orders':
             user_id = body.get('user_id')
             customer_name = body.get('customer_name', '').strip()
@@ -299,6 +455,7 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
             city = body.get('city', '').strip()
             postal_code = body.get('postal_code', '').strip()
             payment_method = body.get('payment_method', 'Credit Card')
+            discount = float(body.get('discount', 0))
             items = body.get('items', [])
 
             if not customer_name or not customer_email or not shipping_address or not items:
@@ -306,9 +463,10 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
                 return
 
             subtotal = sum(item.get('price', 0) * item.get('quantity', 1) for item in items)
-            tax = round(subtotal * 0.08, 2)
-            shipping = 0.00 if subtotal >= 35.00 else 5.99  # Amazon-style free delivery over $35
-            total_amount = round(subtotal + tax + shipping, 2)
+            taxable_subtotal = max(0.0, subtotal - discount)
+            tax = round(taxable_subtotal * 0.08, 2)
+            shipping = 0.00 if subtotal >= 35.00 else 5.99
+            total_amount = round(taxable_subtotal + tax + shipping, 2)
 
             order_number = f"AMZ-{datetime.now().strftime('%Y%m%d%H%M%S')}-{int(datetime.now().timestamp() % 1000)}"
 
@@ -317,9 +475,9 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
 
             cursor.execute("""
             INSERT INTO orders 
-            (order_number, user_id, customer_name, customer_email, shipping_address, city, postal_code, payment_method, subtotal, tax, shipping, total_amount, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Processing')
-            """, (order_number, user_id, customer_name, customer_email, shipping_address, city, postal_code, payment_method, subtotal, tax, shipping, total_amount))
+            (order_number, user_id, customer_name, customer_email, shipping_address, city, postal_code, payment_method, subtotal, discount, tax, shipping, total_amount, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Processing')
+            """, (order_number, user_id, customer_name, customer_email, shipping_address, city, postal_code, payment_method, subtotal, discount, tax, shipping, total_amount))
 
             order_id = cursor.lastrowid
 
@@ -339,6 +497,7 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
                     'id': order_id,
                     'order_number': order_number,
                     'subtotal': subtotal,
+                    'discount': discount,
                     'tax': tax,
                     'shipping': shipping,
                     'total_amount': total_amount,
@@ -349,7 +508,28 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
             })
             return
 
-        # 4. Admin - Add Product
+        # 5. Wishlist toggle
+        if path == '/api/wishlist':
+            user_id = body.get('user_id', 1)
+            product_id = body.get('product_id')
+            if not product_id:
+                self._send_error_json("Product ID required", 400)
+                return
+            conn = get_db()
+            cursor = conn.cursor()
+            try:
+                cursor.execute("INSERT INTO wishlist (user_id, product_id) VALUES (?, ?)", (user_id, product_id))
+                conn.commit()
+                conn.close()
+                self._send_json({'success': True, 'message': 'Added to your Wishlist!'})
+            except sqlite3.IntegrityError:
+                cursor.execute("DELETE FROM wishlist WHERE user_id = ? AND product_id = ?", (user_id, product_id))
+                conn.commit()
+                conn.close()
+                self._send_json({'success': True, 'message': 'Removed from your Wishlist!'})
+            return
+
+        # 6. Admin - Add Product
         if path == '/api/admin/products':
             title = body.get('title', '').strip()
             category = body.get('category', 'Electronics')
@@ -359,6 +539,7 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
             image_url = body.get('image_url', 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800')
             description = body.get('description', '')
             badge = body.get('badge', '')
+            deal_of_day = int(body.get('deal_of_day', 0))
             features = body.get('features', [])
 
             if not title or price <= 0:
@@ -369,9 +550,9 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
             cursor = conn.cursor()
             cursor.execute("""
             INSERT INTO products 
-            (title, category, price, original_price, discount_pct, rating, rating_count, image_url, description, features, in_stock, prime_eligible, badge)
-            VALUES (?, ?, ?, ?, ?, 4.8, 1, ?, ?, ?, 1, 1, ?)
-            """, (title, category, price, original_price, discount_pct, image_url, description, json.dumps(features), badge))
+            (title, category, price, original_price, discount_pct, rating, rating_count, image_url, description, features, in_stock, prime_eligible, badge, deal_of_day)
+            VALUES (?, ?, ?, ?, ?, 4.8, 1, ?, ?, ?, 1, 1, ?, ?)
+            """, (title, category, price, original_price, discount_pct, image_url, description, json.dumps(features), badge, deal_of_day))
             conn.commit()
             new_id = cursor.lastrowid
             conn.close()
@@ -379,7 +560,7 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
             self._send_json({'success': True, 'message': 'Product created successfully', 'product_id': new_id})
             return
 
-        # 5. Add Review
+        # 7. Add Review
         if path == '/api/reviews':
             product_id = body.get('product_id')
             user_name = body.get('user_name', 'Verified Customer')
@@ -397,7 +578,6 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
             VALUES (?, ?, ?, ?)
             """, (product_id, user_name, rating, comment))
 
-            # Update product rating and count
             cursor.execute("""
             UPDATE products 
             SET rating_count = rating_count + 1,
@@ -418,7 +598,6 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
         path = parsed_url.path
         body = self._read_json_body()
 
-        # Admin - Update Product
         if path.startswith('/api/admin/products/'):
             product_id = path.split('/')[-1]
             if product_id.isdigit():
@@ -426,7 +605,7 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
                 cursor = conn.cursor()
                 cursor.execute("""
                 UPDATE products 
-                SET title = ?, category = ?, price = ?, original_price = ?, discount_pct = ?, image_url = ?, description = ?, in_stock = ?, badge = ?
+                SET title = ?, category = ?, price = ?, original_price = ?, discount_pct = ?, image_url = ?, description = ?, in_stock = ?, badge = ?, deal_of_day = ?
                 WHERE id = ?
                 """, (
                     body.get('title'),
@@ -438,6 +617,7 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
                     body.get('description'),
                     int(body.get('in_stock', 1)),
                     body.get('badge', ''),
+                    int(body.get('deal_of_day', 0)),
                     int(product_id)
                 ))
                 conn.commit()
@@ -452,7 +632,6 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
         path = parsed_url.path
         body = self._read_json_body()
 
-        # Admin - Update Order Status
         if path.startswith('/api/orders/') and path.endswith('/status'):
             parts = path.split('/')
             order_id = parts[3]
@@ -473,7 +652,6 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
         parsed_url = urllib.parse.urlparse(self.path)
         path = parsed_url.path
 
-        # Admin - Delete Product
         if path.startswith('/api/admin/products/'):
             product_id = path.split('/')[-1]
             if product_id.isdigit():
@@ -481,6 +659,7 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
                 cursor = conn.cursor()
                 cursor.execute("DELETE FROM products WHERE id = ?", (int(product_id),))
                 cursor.execute("DELETE FROM reviews WHERE product_id = ?", (int(product_id),))
+                cursor.execute("DELETE FROM wishlist WHERE product_id = ?", (int(product_id),))
                 conn.commit()
                 conn.close()
                 self._send_json({'success': True, 'message': 'Product deleted successfully!'})
@@ -496,7 +675,7 @@ def run():
     print(" 🚀 Amazon Clone E-Commerce Server Running!")
     print(f" 🌐 Local URL: http://localhost:{PORT}")
     print(f" 👨‍💻 Author: Bhuvan Kolisetti")
-    print(" 📦 Database: SQLite (ecommerce.db)")
+    print(" 📦 Database: SQLite (ecommerce.db) with 26 Products")
     print("=" * 60)
     try:
         httpd.serve_forever()
