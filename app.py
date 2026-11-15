@@ -50,7 +50,9 @@ class AmazonRequestHandler(BaseHTTPRequestHandler):
         self._send_json({'error': message, 'success': False}, status)
 
     def _serve_template(self, filename):
-        file_path = os.path.join(TEMPLATES_DIR, filename)
+        file_path = os.path.join(BASE_DIR, filename)
+        if not os.path.exists(file_path):
+            file_path = os.path.join(TEMPLATES_DIR, filename)
         if os.path.exists(file_path):
             self._set_headers(200, 'text/html; charset=utf-8')
             with open(file_path, 'rb') as f:
