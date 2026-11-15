@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amazon Clone | Final Year E-Commerce Project</title>
+  <link rel="stylesheet" href="static/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+</head>
+<body>
+
+  <!-- Top Nav -->
+  <header>
+    <div class="navbar-top">
+      <a href="index.html" class="nav-logo">
+        <span class="brand-text">amazon<span class="brand-accent">.in</span></span>
+      </a>
+
+      <div class="nav-deliver" onclick="window.location.href='checkout.html'">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        <div>
+          <div class="nav-deliver-line1">Deliver to Bhuvan</div>
+          <div class="nav-deliver-line2">Hyderabad 500081</div>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <form class="nav-search-container" id="navSearchForm" onsubmit="handleNavSearch(event)">
+        <select class="search-select" id="searchCategorySelect" onchange="filterByCategory(this.value)">
+          <option value="All">All Departments</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Fashion">Fashion</option>
+          <option value="Home & Kitchen">Home & Kitchen</option>
+          <option value="Books">Books</option>
+        </select>
+        <div style="flex: 1; position: relative;">
+          <input type="text" class="search-input" id="navSearchInput" placeholder="Search Amazon products, brands, and deals..." autocomplete="off">
+          <div id="searchSuggestionsBox" class="suggestions-box"></div>
+        </div>
+        <button type="submit" class="search-btn" title="Search">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
+        </button>
+      </form>
+
+      <div class="nav-right">
+        <a href="login.html" class="nav-item">
+          <span class="nav-line1" id="navAccountName">Hello, sign in</span>
+          <span class="nav-line2">Account & Lists ▾</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+          <span class="nav-line1">Returns</span>
+          <span class="nav-line2">& Orders</span>
+        </a>
+        <a href="cart.html" class="nav-item nav-cart">
+          <div class="cart-icon-wrapper">
+            <span class="cart-count" id="navCartCount">0</span>
+            <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+          </div>
+          <span class="nav-line2" style="margin-top: 10px;">Cart</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Subnav -->
+    <div class="navbar-sub">
+      <div class="subnav-link" onclick="filterByCategory('All')">☰ All</div>
+      <a href="deals.html" class="subnav-link">🔥 Today's Deals</a>
+      <div class="subnav-link" onclick="filterByCategory('Electronics')">Electronics</div>
+      <div class="subnav-link" onclick="filterByCategory('Fashion')">Fashion & Clothing</div>
+      <div class="subnav-link" onclick="filterByCategory('Home & Kitchen')">Home & Kitchen</div>
+      <div class="subnav-link" onclick="filterByCategory('Books')">Books & Study</div>
+      <a href="cart.html" class="subnav-link">🛒 View Cart</a>
+      <a href="orders.html" class="subnav-link">📦 My Orders</a>
+      <a href="admin.html" class="subnav-link admin-link" id="adminSubnavLink">
+        ⚙️ Seller / Admin Portal
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="hero-slider">
+    <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1600&q=80');">
+      <div class="slide-content">
+        <span class="slide-tag">Prime Day Special</span>
+        <h1 class="slide-title">Next-Gen Tech & Flagship Electronics</h1>
+        <p class="slide-desc">Save up to 40% on Laptops, 4K Smart TVs, Noise-Canceling Audio, and Flagship Smart Devices.</p>
+        <button class="slide-btn" onclick="filterByCategory('Electronics')">Explore Electronics Deals</button>
+      </div>
+    </div>
+    <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80');">
+      <div class="slide-content">
+        <span class="slide-tag">Trending Fashion</span>
+        <h1 class="slide-title">Seasonal Styles & Designer Apparel</h1>
+        <p class="slide-desc">Discover the season's most-loved outerwear, luxury watches, and athletic performance footwear.</p>
+        <button class="slide-btn" onclick="filterByCategory('Fashion')">Shop Fashion</button>
+      </div>
+    </div>
+    <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1600&q=80');">
+      <div class="slide-content">
+        <span class="slide-tag">Home Upgrades</span>
+        <h1 class="slide-title">Elevate Your Kitchen & Living Space</h1>
+        <p class="slide-desc">Top-rated Espresso Machines, Air Fryers, and Smart Autonomous Cleaners for your smart home.</p>
+        <button class="slide-btn" onclick="filterByCategory('Home & Kitchen')">Upgrade Your Home</button>
+      </div>
+    </div>
+    <button class="slider-btn slider-prev" id="sliderPrev">❮</button>
+    <button class="slider-btn slider-next" id="sliderNext">❯</button>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="featured-grid">
+      <div class="category-card">
+        <h3 class="card-title">Top Deals in Electronics</h3>
+        <div class="card-image-box" onclick="filterByCategory('Electronics')">
+          <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80" alt="Electronics">
+        </div>
+        <span class="card-link" onclick="filterByCategory('Electronics')">See all high-tech offers &gt;</span>
+      </div>
+
+      <div class="category-card">
+        <h3 class="card-title">Trending Styles & Fashion</h3>
+        <div class="card-image-box" onclick="filterByCategory('Fashion')">
+          <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" alt="Fashion">
+        </div>
+        <span class="card-link" onclick="filterByCategory('Fashion')">Shop the latest looks &gt;</span>
+      </div>
+
+      <div class="category-card">
+        <h3 class="card-title">Home & Kitchen Essentials</h3>
+        <div class="card-image-box" onclick="filterByCategory('Home & Kitchen')">
+          <img src="https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?auto=format&fit=crop&w=600&q=80" alt="Home and Kitchen">
+        </div>
+        <span class="card-link" onclick="filterByCategory('Home & Kitchen')">Discover appliances &gt;</span>
+      </div>
+
+      <div class="category-card">
+        <h3 class="card-title">Best Sellers in Books</h3>
+        <div class="card-image-box" onclick="filterByCategory('Books')">
+          <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80" alt="Books">
+        </div>
+        <span class="card-link" onclick="filterByCategory('Books')">Browse bestsellers &gt;</span>
+      </div>
+    </div>
+
+    <!-- Product Catalog Section -->
+    <section class="catalog-section">
+      <div class="catalog-header">
+        <div>
+          <h2 class="catalog-title">Results & Featured Products</h2>
+          <span style="font-size: 13px; color: #565959;">Price and other details may vary based on product size and color.</span>
+        </div>
+        <div class="catalog-controls">
+          <label for="sortSelect" style="font-size: 13px; font-weight: 600;">Sort by:</label>
+          <select id="sortSelect" class="sort-select">
+            <option value="featured">Featured</option>
+            <option value="price_low">Price: Low to High</option>
+            <option value="price_high">Price: High to Low</option>
+            <option value="rating">Avg. Customer Review</option>
+            <option value="discount">Biggest Savings</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills & Price Filters -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+        <div class="category-pills" style="margin-bottom: 0;">
+          <button class="pill-btn active" data-category="All" onclick="filterByCategory('All')">All Products</button>
+          <button class="pill-btn" data-category="Electronics" onclick="filterByCategory('Electronics')">Electronics (8)</button>
+          <button class="pill-btn" data-category="Fashion" onclick="filterByCategory('Fashion')">Fashion & Apparel (7)</button>
+          <button class="pill-btn" data-category="Home & Kitchen" onclick="filterByCategory('Home & Kitchen')">Home & Kitchen (6)</button>
+          <button class="pill-btn" data-category="Books" onclick="filterByCategory('Books')">Books & Study (5)</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+          <span>Price:</span>
+          <input type="number" id="minPriceFilter" placeholder="Min $" style="width: 75px; padding: 4px 8px; border: 1px solid var(--amz-border); border-radius: 4px;">
+          <span>to</span>
+          <input type="number" id="maxPriceFilter" placeholder="Max $" style="width: 75px; padding: 4px 8px; border: 1px solid var(--amz-border); border-radius: 4px;">
+          <button onclick="loadProducts()" class="btn-add-cart" style="padding: 4px 12px; font-size: 12px;">Go</button>
+        </div>
+      </div>
+
+      <div class="products-grid" id="productsGrid"></div>
+    </section>
+  </main>
+
+  <!-- Slide-out Cart Drawer -->
+  <div class="cart-drawer-overlay" id="cartDrawerOverlay"></div>
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+      <h3 class="cart-drawer-title">Shopping Cart</h3>
+      <button class="close-btn" onclick="closeCartDrawer()">✕</button>
+    </div>
+    <div class="cart-free-shipping">
+      <div id="freeShippingText">Add items to qualify for FREE Delivery</div>
+      <div class="cart-progress-bar">
+        <div class="cart-progress-fill" id="freeShippingProgress" style="width: 0%;"></div>
+      </div>
+    </div>
+    <div class="cart-items-list" id="cartItemsList"></div>
+    <div class="cart-drawer-footer">
+      <div class="cart-subtotal-row">
+        <span>Subtotal:</span>
+        <span id="cartDrawerSubtotal">$0.00</span>
+      </div>
+      <button class="btn-checkout" onclick="window.location.href='cart.html'">
+        View Cart & Proceed to Buy
+      </button>
+    </div>
+  </aside>
+
+  <div id="toast" class="toast"></div>
+
+  <footer>
+    <div class="footer-back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Back to top</div>
+    <div class="footer-bottom">
+      <p>Final Year Academic Project: Full-Stack Amazon Clone E-Commerce Web Application</p>
+      <p>Developed with ❤️ by <strong>Bhuvan Kolisetti</strong> | <a href="https://github.com/bhuvankolisetti/e-commerce" style="color: var(--amz-yellow);" target="_blank">GitHub Repository</a></p>
+      <p style="margin-top: 6px; color: #777;">© 2026 Amazon Clone, Inc. Built for educational & final year capstone evaluation.</p>
+    </div>
+  </footer>
+
+  <script src="static/js/app.js"></script>
+</body>
+</html>
